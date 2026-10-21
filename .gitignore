@@ -1,0 +1,42 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Streamlit run cache & secrets
+.streamlit/secrets.toml
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Large weights checkpoints (preserve models directory via README)
+models/*.pth
+models/*.pt
+models/*.h5
+models/*.keras
+models/*.onnx
+!models/README.md
+
+# Large raw datasets (preserve samples)
+Dataset/
+data/*.zip
+data/*.tar.gz
+data/raw/
+!data/samples/
+!data/README.md
+
+# Build & egg distribution artifacts
+build/
+dist/
+*.egg-info/

@@ -1,0 +1,57 @@
+{
+    "MobileNetV2": {
+        "accuracy": null,
+        "precision": null,
+        "recall": null,
+        "f1_score": null,
+        "model_size_mb": 14.2,
+        "inference_time_ms": null,
+        "support": null,
+        "status": "Production Pipeline (Checkpoint Pending)",
+        "notes": "Designated production pipeline in train.py and finetune.py. Optimized for edge deployment.",
+        "class_metrics": null
+    },
+    "EfficientNet": {
+        "accuracy": 0.8125,
+        "precision": 0.8329,
+        "recall": 0.8125,
+        "f1_score": 0.8139,
+        "model_size_mb": 21.4,
+        "inference_time_ms": null,
+        "support": 400,
+        "status": "Evaluated on Test Split (400 images)",
+        "notes": "Verified from efficientnet_classification_report.txt (81.25% test accuracy on held-out test split).",
+        "class_metrics": {
+            "Healthy": {
+                "precision": 0.7384,
+                "recall": 0.9071,
+                "f1_score": 0.8141,
+                "support": 140
+            },
+            "Black Rot": {
+                "precision": 0.9606,
+                "recall": 0.7439,
+                "f1_score": 0.8385,
+                "support": 164
+            },
+            "Insect Hole": {
+                "precision": 0.7525,
+                "recall": 0.7917,
+                "f1_score": 0.7716,
+                "support": 96
+            }
+        }
+    },
+    "ResNet": {
+        "accuracy": null,
+        "precision": null,
+        "recall": null,
+        "f1_score": null,
+        "model_size_mb": 98.0,
+        "inference_time_ms": null,
+        "support": null,
+        "status": "Candidate Architecture (Unimplemented)",
+        "notes": "Heavy residual architecture. Pending implementation and benchmark on held-out splits.",
+        "class_metrics": null
+    }
+}

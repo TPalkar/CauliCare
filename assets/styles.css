@@ -1,0 +1,412 @@
+/* ==============================================================================
+   CauliCare AI - Premium AgriTech Design System
+   Color Palette:
+     Primary Forest Green: #173F35
+     Secondary Green:      #2F6B4F
+     Light Leaf Green:     #D8E8C8
+     Warm Cream Background:#F5F4E9
+     Card Background:      #FFFFFF
+     Main Text:            #1E2923
+     Secondary Text:       #68736B
+     Border:               #E2E7DF
+     Warning / Alert:      #D97706
+     Error / Critical:     #B91C1C
+   ============================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --cc-primary: #173F35;
+    --cc-secondary: #2F6B4F;
+    --cc-light-leaf: #D8E8C8;
+    --cc-cream-bg: #F5F4E9;
+    --cc-card-bg: #FFFFFF;
+    --cc-text-main: #1E2923;
+    --cc-text-muted: #68736B;
+    --cc-border: #E2E7DF;
+    --cc-border-focus: #2F6B4F;
+    --cc-warning: #D97706;
+    --cc-error: #B91C1C;
+    --cc-success: #15803D;
+    --cc-shadow-sm: 0 1px 3px rgba(23, 63, 53, 0.05), 0 1px 2px rgba(23, 63, 53, 0.03);
+    --cc-shadow-md: 0 4px 12px rgba(23, 63, 53, 0.06), 0 2px 4px rgba(23, 63, 53, 0.04);
+    --cc-shadow-lg: 0 12px 28px rgba(23, 63, 53, 0.08), 0 4px 10px rgba(23, 63, 53, 0.04);
+    --cc-radius-sm: 8px;
+    --cc-radius-md: 14px;
+    --cc-radius-lg: 20px;
+}
+
+/* Global Page Resets & Streamlit Base Styling */
+html, body, [data-testid="stAppViewContainer"] {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    background-color: var(--cc-cream-bg) !important;
+    color: var(--cc-text-main) !important;
+    -webkit-font-smoothing: antialiased;
+}
+
+[data-testid="stHeader"] {
+    background: transparent !important;
+}
+
+[data-testid="stSidebar"] {
+    background-color: #FFFFFF !important;
+    border-right: 1px solid var(--cc-border) !important;
+}
+
+/* Main Container Padding */
+.main .block-container {
+    padding-top: 2rem !important;
+    padding-bottom: 3.5rem !important;
+    max-width: 1200px !important;
+}
+
+/* Typography Hierarchy */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif !important;
+    color: var(--cc-primary) !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+}
+
+p, li, span, label {
+    color: var(--cc-text-main);
+    line-height: 1.6;
+}
+
+/* Header & Brand Banner */
+.cc-navbar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.75rem;
+    background: var(--cc-card-bg);
+    border: 1px solid var(--cc-border);
+    border-radius: var(--cc-radius-md);
+    box-shadow: var(--cc-shadow-sm);
+    margin-bottom: 2rem;
+}
+
+.cc-brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.cc-brand-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--cc-primary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.cc-brand-sub {
+    font-size: 0.85rem;
+    color: var(--cc-text-muted);
+    margin: 0;
+}
+
+/* Hero Section Cards */
+.cc-hero-card {
+    background: var(--cc-card-bg);
+    border: 1px solid var(--cc-border);
+    border-radius: var(--cc-radius-lg);
+    padding: 2.75rem 2.5rem;
+    box-shadow: var(--cc-shadow-md);
+    margin-bottom: 2.25rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.cc-hero-headline {
+    font-size: 2.45rem;
+    font-weight: 800;
+    line-height: 1.18;
+    color: var(--cc-primary);
+    margin-bottom: 1rem;
+    letter-spacing: -0.03em;
+}
+
+.cc-hero-body {
+    font-size: 1.05rem;
+    color: var(--cc-text-muted);
+    line-height: 1.65;
+    margin-bottom: 1.75rem;
+}
+
+/* AgriTech Metric Cards */
+.cc-metric-card {
+    background: var(--cc-card-bg);
+    border: 1px solid var(--cc-border);
+    border-radius: var(--cc-radius-md);
+    padding: 1.5rem 1.25rem;
+    box-shadow: var(--cc-shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.cc-metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--cc-shadow-md);
+    border-color: var(--cc-secondary);
+}
+
+.cc-metric-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--cc-text-muted);
+    margin-bottom: 0.35rem;
+}
+
+.cc-metric-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--cc-primary);
+    line-height: 1.15;
+    margin: 0.2rem 0;
+}
+
+.cc-metric-sub {
+    font-size: 0.82rem;
+    color: var(--cc-secondary);
+    font-weight: 500;
+}
+
+/* Standard Content Cards */
+.cc-card {
+    background: var(--cc-card-bg);
+    border: 1px solid var(--cc-border);
+    border-radius: var(--cc-radius-md);
+    padding: 1.75rem;
+    box-shadow: var(--cc-shadow-sm);
+    margin-bottom: 1.75rem;
+}
+
+.cc-card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--cc-primary);
+    margin-bottom: 0.5rem;
+}
+
+.cc-card-desc {
+    font-size: 0.92rem;
+    color: var(--cc-text-muted);
+    margin-bottom: 1.25rem;
+}
+
+/* Status Badges */
+.cc-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.cc-badge-success {
+    background-color: #E8F5E9;
+    color: #1B5E20;
+    border: 1px solid #C8E6C9;
+}
+
+.cc-badge-warning {
+    background-color: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+}
+
+.cc-badge-error {
+    background-color: #FEE2E2;
+    color: #991B1B;
+    border: 1px solid #FECACA;
+}
+
+.cc-badge-neutral {
+    background-color: #F1F5F0;
+    color: var(--cc-primary);
+    border: 1px solid var(--cc-border);
+}
+
+/* Streamlit Buttons Overrides */
+div.stButton > button {
+    background-color: var(--cc-primary) !important;
+    color: #FFFFFF !important;
+    border: 1px solid var(--cc-primary) !important;
+    border-radius: var(--cc-radius-sm) !important;
+    padding: 0.65rem 1.4rem !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    letter-spacing: 0.01em !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 0 2px 4px rgba(23, 63, 53, 0.12) !important;
+}
+
+div.stButton > button:hover {
+    background-color: var(--cc-secondary) !important;
+    border-color: var(--cc-secondary) !important;
+    color: #FFFFFF !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(23, 63, 53, 0.18) !important;
+}
+
+div.stButton > button:active {
+    transform: translateY(0px) !important;
+}
+
+/* Secondary Button Style */
+div.stButton > button[kind="secondary"] {
+    background-color: transparent !important;
+    color: var(--cc-primary) !important;
+    border: 1.5px solid var(--cc-secondary) !important;
+}
+
+div.stButton > button[kind="secondary"]:hover {
+    background-color: #EBF2EC !important;
+    color: var(--cc-primary) !important;
+}
+
+/* Workflow Step Cards */
+.cc-step-card {
+    background: #FFFFFF;
+    border: 1px solid var(--cc-border);
+    border-radius: var(--cc-radius-md);
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+    height: 100%;
+}
+
+.cc-step-num {
+    width: 38px;
+    height: 38px;
+    line-height: 38px;
+    background: var(--cc-light-leaf);
+    color: var(--cc-primary);
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 50%;
+    margin: 0 auto 1rem auto;
+}
+
+.cc-step-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--cc-primary);
+    margin-bottom: 0.4rem;
+}
+
+.cc-step-text {
+    font-size: 0.88rem;
+    color: var(--cc-text-muted);
+}
+
+/* Streamlit File Uploader Box */
+[data-testid="stFileUploader"] {
+    background-color: #FAFAF7 !important;
+    border: 2px dashed #CCD7C7 !important;
+    border-radius: var(--cc-radius-md) !important;
+    padding: 1.5rem !important;
+    transition: border-color 0.2s ease;
+}
+
+[data-testid="stFileUploader"]:hover {
+    border-color: var(--cc-secondary) !important;
+}
+
+/* Image preview containers */
+.cc-image-container {
+    border-radius: var(--cc-radius-md);
+    overflow: hidden;
+    border: 1px solid var(--cc-border);
+    box-shadow: var(--cc-shadow-sm);
+    background: #FFFFFF;
+}
+
+/* Info and Alert callouts */
+.cc-callout {
+    padding: 1rem 1.25rem;
+    border-radius: var(--cc-radius-sm);
+    font-size: 0.9rem;
+    margin: 1rem 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.cc-callout-info {
+    background: #F0F6F2;
+    border-left: 4px solid var(--cc-secondary);
+    color: var(--cc-text-main);
+}
+
+.cc-callout-warning {
+    background: #FFFBEB;
+    border-left: 4px solid var(--cc-warning);
+    color: #92400E;
+}
+
+/* Model Comparison Table */
+.cc-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #FFFFFF;
+    border-radius: var(--cc-radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--cc-border);
+}
+
+.cc-table th {
+    background: #F4F7F4;
+    color: var(--cc-primary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.9rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--cc-border);
+}
+
+.cc-table td {
+    padding: 0.85rem 1rem;
+    font-size: 0.92rem;
+    color: var(--cc-text-main);
+    border-bottom: 1px solid #EEF2EC;
+}
+
+.cc-table tr:last-child td {
+    border-bottom: none;
+}
+
+.cc-table tr:hover td {
+    background-color: #FBFDFB;
+}
+
+/* Streamlit Tabs Customization */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+    border-bottom: 1px solid var(--cc-border);
+    padding-bottom: 4px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background-color: transparent !important;
+    border-radius: var(--cc-radius-sm) !important;
+    color: var(--cc-text-muted) !important;
+    font-weight: 600 !important;
+    padding: 8px 16px !important;
+    border: none !important;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: #EBF2EC !important;
+    color: var(--cc-primary) !important;
+}
