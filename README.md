@@ -1,4 +1,4 @@
-# CauliCare AI — Intelligent Cauliflower Leaf Disease Detection
+# CauliCare — Intelligent Cauliflower Leaf Disease Detection
 
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.66-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.22-FF6F00?logo=tensorflow&logoColor=white)](https://tensorflow.org)
@@ -6,18 +6,18 @@
 [![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.14-3776AB?logo=python&logoColor=white)](https://python.org)
 [![GitHub](https://img.shields.io/badge/GitHub-TPalkar%2FCauliCare-181717?logo=github&logoColor=white)](https://github.com/TPalkar/CauliCare.git)
 
-**CauliCare AI** is an end-to-end precision agriculture platform designed for automated pathological screening of cauliflower (*Brassica oleracea*) crops. The application integrates deep convolutional neural networks (**TensorFlow / Keras MobileNetV2** production pipeline, alongside **EfficientNet-B0** benchmark evaluation), empirical performance dashboards, visual saliency maps (**Grad-CAM**), and science-backed agronomic guidance.
+**CauliCare** is an end-to-end precision agriculture platform designed for automated pathological screening of cauliflower (*Brassica oleracea*) crops. The application integrates deep convolutional neural networks (**TensorFlow / Keras MobileNetV2** production pipeline, alongside **EfficientNet-B0** benchmark evaluation), empirical performance dashboards, visual saliency maps (**Grad-CAM**), and science-backed agronomic guidance.
 
 ---
 
-## 📑 Scientific & Dataset References
+## Scientific & Dataset References
 - **Research Paper:** [PMC Article PMC12175232 — Deep Learning for Cauliflower Disease Detection](https://pmc.ncbi.nlm.nih.gov/articles/PMC12175232/)
 - **Dataset Archive:** [Mendeley Data — Cauliflower Leaf Dataset (v1)](https://data.mendeley.com/datasets/x995snz7p3/1)
 - **GitHub Repository:** [https://github.com/TPalkar/CauliCare.git](https://github.com/TPalkar/CauliCare.git) (`main` branch)
 
 ---
 
-## 🎯 Unified Diagnostic Scope & Class Mapping
+## Unified Diagnostic Scope & Class Mapping
 
 The model classifies leaves into three distinct phytopathological conditions with an explicit, unified index mapping across data preparation, training, fine-tuning, evaluation, and user interface:
 
@@ -29,7 +29,7 @@ The model classifies leaves into three distinct phytopathological conditions wit
 
 ---
 
-## 🏛️ Repository Structure
+## Repository Structure
 
 ```text
 CauliCare/
@@ -91,7 +91,7 @@ CauliCare/
 
 ---
 
-## 🚀 Setup & Launch Instructions (Windows PowerShell)
+## Setup & Launch Instructions (Windows PowerShell)
 
 All commands are run from the project root directory (`C:\Users\Arya\Documents\CauliCare-repo`):
 
@@ -119,7 +119,7 @@ Executes tests covering preprocessing, class mapping, missing model fallback, em
 
 ---
 
-## 🔬 Model Training & Evaluation Pipeline
+## Model Training & Evaluation Pipeline
 
 ### Step 1: Prepare Dataset Splits
 Place the raw dataset inside:
@@ -161,7 +161,7 @@ Saves `confusion_matrix.png`, prints test loss, test accuracy, and classificatio
 
 ---
 
-## 📊 Verified Empirical Benchmark Results
+## Verified Empirical Benchmark Results
 
 The repository includes verified test set benchmarks on held-out cauliflower test samples:
 
@@ -178,7 +178,7 @@ The repository includes verified test set benchmarks on held-out cauliflower tes
 
 ---
 
-## 🔍 Visual Explainability (Grad-CAM)
+## Visual Explainability (Grad-CAM)
 
 The application computes gradient-weighted class activation maps using **TensorFlow `GradientTape`**:
 1. Locates the final convolutional layer (e.g. `Conv_1` in MobileNetV2).
@@ -190,6 +190,6 @@ The application computes gradient-weighted class activation maps using **TensorF
 
 ---
 
-## ⚠️ Known Limitations & Agronomic Guidance
+## Known Limitations & Agronomic Guidance
 - **Field Illumination & Glare**: Strong direct sunlight or deep shadow can alter leaf chromaticity. For best results, capture images in diffuse natural daylight.
 - **Nutritional Mimics**: Severe nitrogen or boron deficiencies can manifest marginal chlorosis visually similar to early Black Rot. Confirm large-scale infections with local agricultural extension plant pathology diagnostics.

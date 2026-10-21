@@ -1,5 +1,5 @@
 """
-CauliCare AI - Central Configuration and Settings
+CauliCare - Central Configuration and Settings
 Unified configuration for TensorFlow / Keras pipeline, class mapping,
 dataset statistics, model architectures, and AgriTech visual design tokens.
 """

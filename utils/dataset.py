@@ -1,5 +1,5 @@
 """
-Dataset statistics, metadata access, and sample image discovery for CauliCare AI.
+Dataset statistics, metadata access, and sample image discovery for CauliCare.
 """
 
 from pathlib import Path

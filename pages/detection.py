@@ -1,5 +1,5 @@
 """
-CauliCare AI - Disease Detection Page
+CauliCare - Disease Detection Page
 Handles leaf image upload, input validation, photography guidelines,
 and execution of the deep learning inference pipeline.
 """
@@ -152,7 +152,7 @@ def show():
 
             clear_col1, clear_col2 = st.columns([1, 1])
             with clear_col1:
-                if st.button("🗑️ Clear / Replace Image", key="clear_img_btn", use_container_width=True):
+                if st.button("Clear / Replace Image", key="clear_img_btn", use_container_width=True):
                     if "loaded_sample_path" in st.session_state:
                         del st.session_state["loaded_sample_path"]
                     if "loaded_sample_name" in st.session_state:
@@ -161,7 +161,7 @@ def show():
 
             # Prominent Forest-Green "Analyse Image" Button
             st.markdown("<div style='height: 0.75rem;'></div>", unsafe_allow_html=True)
-            if st.button("🌿 Analyse Image", key="run_inference_btn", use_container_width=True):
+            if st.button("Analyse Image", key="run_inference_btn", use_container_width=True):
                 with st.spinner("Executing neural inference and computing probability spectrum..."):
                     result = run_prediction(active_image, model_name=DEFAULT_PRODUCTION_MODEL)
 
@@ -183,7 +183,7 @@ def show():
         st.markdown(
             f"""
             <div class="cc-card">
-                <h3 class="cc-card-title">📸 Photography Guidelines</h3>
+                <h3 class="cc-card-title">Photography Guidelines</h3>
                 <p class="cc-card-desc">For optimal feature extraction and high classification confidence:</p>
                 <ul style="padding-left: 1.25rem; font-size: 0.9rem; color: {THEME['text_main']}; line-height: 1.7;">
                     <li><b>Focus on a single leaf:</b> Capture the upper (adaxial) blade where lesions and veins are distinct.</li>
@@ -200,7 +200,7 @@ def show():
         st.markdown(
             f"""
             <div class="cc-card">
-                <h3 class="cc-card-title">⚙️ Pipeline Specifications</h3>
+                <h3 class="cc-card-title">Pipeline Specifications</h3>
                 <div style="font-size: 0.88rem; color: {THEME['text_main']}; line-height: 1.6;">
                     <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #EEF2EC;">
                         <span style="color: {THEME['text_muted']};">Input Resolution:</span>
@@ -208,15 +208,15 @@ def show():
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #EEF2EC;">
                         <span style="color: {THEME['text_muted']};">Channel Normalization:</span>
-                        <b>ImageNet Mean & Std</b>
+                        <b>MobileNetV2 Standard (-1 to 1)</b>
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #EEF2EC;">
                         <span style="color: {THEME['text_muted']};">Class Index Order:</span>
-                        <b>Healthy, Insect, Black Rot</b>
+                        <b>Healthy, Black Rot, Insect Hole</b>
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: 6px 0;">
-                        <span style="color: {THEME['text_muted']};">Expected Checkpoint:</span>
-                        <code>models/{DEFAULT_PRODUCTION_MODEL.lower()}_cauliflower.pth</code>
+                        <span style="color: {THEME['text_muted']};">Active Checkpoint:</span>
+                        <code>models/caulicare_finetuned.keras</code>
                     </div>
                 </div>
             </div>
@@ -228,9 +228,9 @@ def show():
             st.markdown(
                 f"""
                 <div style="background: #FFFBEB; border: 1.5px solid #FDE68A; border-radius: 10px; padding: 1rem; font-size: 0.86rem; color: #92400E;">
-                    <b>💡 Missing Weights Guidance:</b><br>
-                    Trained PyTorch weights are currently pending for <code>{DEFAULT_PRODUCTION_MODEL}</code>. 
-                    Place your fine-tuned <code>.pth</code> file inside the <code>models/</code> folder to activate real-time inference.
+                    <b>Missing Weights Guidance:</b><br>
+                    Trained weights are currently pending for <code>{DEFAULT_PRODUCTION_MODEL}</code>. 
+                    Place your fine-tuned <code>.keras</code> file inside the <code>models/</code> folder to activate real-time inference.
                 </div>
                 """,
                 unsafe_allow_html=True

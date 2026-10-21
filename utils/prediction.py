@@ -1,5 +1,5 @@
 """
-Inference and prediction pipeline for CauliCare AI using TensorFlow / Keras.
+Inference and prediction pipeline for CauliCare using TensorFlow / Keras.
 Executes forward pass, maps output probabilities to class names,
 records latency, and triggers visual explainability.
 """

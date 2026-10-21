@@ -1,5 +1,5 @@
 """
-Navigation and Sidebar Brand Component for CauliCare AI.
+Navigation and Sidebar Brand Component for CauliCare.
 Provides AgriTech sidebar identity, quick status badges, active prediction shortcuts,
 and external scholarly links.
 """
@@ -24,7 +24,7 @@ def render_sidebar():
     Renders the modern AgriTech sidebar brand, system status, and links.
     """
     with st.sidebar:
-        # Logo and Brand Heading
+        # Logo and Brand Heading (Preserved Logo Artwork)
         logo_path = ASSETS_DIR / "logo.png"
         if logo_path.exists():
             logo_img = Image.open(logo_path)
@@ -34,7 +34,7 @@ def render_sidebar():
             f"""
             <div style="margin-top: 0.25rem; margin-bottom: 1.25rem;">
                 <h2 style="font-size: 1.35rem; color: {THEME['primary']}; margin: 0; font-weight: 800;">
-                    CauliCare AI
+                    CauliCare
                 </h2>
                 <div style="font-size: 0.8rem; color: {THEME['text_muted']}; margin-top: 2px;">
                     Agricultural Pathology Intelligence
@@ -69,7 +69,7 @@ def render_sidebar():
                 unsafe_allow_html=True
             )
 
-            if st.button("📋 Open Diagnostic Results", key="sidebar_results_btn", use_container_width=True):
+            if st.button("Open Diagnostic Results", key="sidebar_results_btn", use_container_width=True):
                 st.switch_page("pages/results.py")
 
             st.markdown("<hr style='border: none; border-top: 1px solid #E2E7DF; margin: 0.75rem 0;'>", unsafe_allow_html=True)

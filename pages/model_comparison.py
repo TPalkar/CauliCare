@@ -1,5 +1,5 @@
 """
-CauliCare AI - Model Comparison & Explainability Dashboard
+CauliCare - Model Comparison & Explainability Dashboard
 Compares MobileNetV2, EfficientNet-B0, and ResNet-50 across empirical accuracy,
 parameter scale, latency, confusion matrices, training histories, and Grad-CAM interpretability.
 """
@@ -129,7 +129,6 @@ def show():
         st.markdown(
             f"""
             <div style="background: #F9FAF8; border: 1.5px dashed #CCD7C7; border-radius: 8px; padding: 2rem; text-align: center;">
-                <span style="font-size: 2rem;">📈</span>
                 <h4 style="color: {THEME['primary']}; margin: 0.5rem 0 0.25rem 0;">Test Metrics Pending</h4>
                 <p style="color: {THEME['text_muted']}; font-size: 0.9rem; max-width: 500px; margin: 0 auto 1rem auto;">
                     Model evaluations have not yet been recorded. Run evaluation scripts to populate results.
@@ -178,7 +177,7 @@ def show():
                                 Generated directly by <code>evaluate_{model_name.lower()}.py</code> on the held-out test split.
                                 True labels on the vertical axis, predicted labels along the horizontal axis.
                             </p>
-                            <span class="cc-badge cc-badge-success">✓ Verified Plot Artifact</span>
+                            <span class="cc-badge cc-badge-success">Verified Plot Artifact</span>
                         </div>
                         """,
                         unsafe_allow_html=True
@@ -199,7 +198,6 @@ def show():
                 st.markdown(
                     f"""
                     <div style="background: #FAFAF7; border: 1px dashed #CCD7C7; border-radius: 8px; padding: 2rem; text-align: center; margin: 1rem 0;">
-                        <span style="font-size: 1.8rem;">🔲</span>
                         <div style="font-weight: 600; color: {THEME['primary']}; margin-top: 0.35rem;">
                             {model_name} Confusion Matrix Pending
                         </div>
@@ -239,7 +237,6 @@ def show():
                 st.markdown(
                     f"""
                     <div style="background: #FAFAF7; border: 1px dashed #CCD7C7; border-radius: 8px; padding: 2rem; text-align: center; margin: 1rem 0;">
-                        <span style="font-size: 1.8rem;">📉</span>
                         <div style="font-weight: 600; color: {THEME['primary']}; margin-top: 0.35rem;">
                             {model_name} Training History Unrecorded
                         </div>
@@ -292,7 +289,6 @@ def show():
                 st.markdown(
                     f"""
                     <div style="background: #FAFAF7; border: 1px dashed #CCD7C7; border-radius: 8px; padding: 2rem; text-align: center; margin: 1rem 0;">
-                        <span style="font-size: 1.8rem;">🔬</span>
                         <div style="font-weight: 600; color: {THEME['primary']}; margin-top: 0.35rem;">
                             Grad-CAM Ready via Live Inference
                         </div>

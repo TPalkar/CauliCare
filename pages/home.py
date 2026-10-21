@@ -1,7 +1,7 @@
 """
-CauliCare AI - Home Landing Page & Dataset Dashboard
+CauliCare - Home Landing Page & Dataset Dashboard
 Features project hero, verified dataset statistics, interactive distribution charts,
-sample specimen gallery, and scientific references.
+sample specimen gallery, and diagnostic workflow.
 """
 
 from pathlib import Path
@@ -11,8 +11,6 @@ from PIL import Image
 from config.settings import (
     ASSETS_DIR,
     THEME,
-    RESEARCH_PAPER_URL,
-    DATASET_SOURCE_URL,
     DATASET_COUNTS,
 )
 from utils.styling import apply_custom_css, render_header
@@ -26,9 +24,9 @@ from components.image_gallery import render_sample_gallery
 
 
 def show():
-    """Renders the complete CauliCare AI Home Page."""
+    """Renders the complete CauliCare Home Page."""
     apply_custom_css()
-    render_header(subtitle="AI-powered cauliflower leaf health analysis")
+    render_header(subtitle="Cauliflower leaf health analysis")
 
     # ==========================================================================
     # HERO SECTION
@@ -40,7 +38,7 @@ def show():
             f"""
             <div style="padding: 1.5rem 0.5rem 1rem 0.5rem;">
                 <span class="cc-badge cc-badge-neutral" style="margin-bottom: 1rem;">
-                    🌱 Precision Agriculture & Computer Vision
+                    Precision Agriculture & Computer Vision
                 </span>
                 <h1 class="cc-hero-headline" style="margin-top: 0.5rem;">
                     Understand Your Crop.<br>
@@ -59,10 +57,10 @@ def show():
 
         btn_col1, btn_col2 = st.columns([1, 1.2])
         with btn_col1:
-            if st.button("🔍 Detect Disease", key="hero_detect_btn", use_container_width=True):
+            if st.button("Detect Disease", key="hero_detect_btn", use_container_width=True):
                 st.switch_page("pages/detection.py")
         with btn_col2:
-            if st.button("📊 Explore Model Performance", key="hero_compare_btn", use_container_width=True):
+            if st.button("Explore Model Performance", key="hero_compare_btn", use_container_width=True):
                 st.switch_page("pages/model_comparison.py")
 
     with hero_col_right:
@@ -81,8 +79,7 @@ def show():
                 f"""
                 <div class="cc-card" style="height: 320px; display: flex; align-items: center; justify-content: center; text-align: center;">
                     <div>
-                        <div style="font-size: 3rem;">🥬</div>
-                        <h4 style="color: {THEME['primary']};">Field Foliage Archive</h4>
+                        <h4 style="color: {THEME['primary']}; margin-bottom: 0.25rem;">Field Foliage Archive</h4>
                         <p style="color: {THEME['text_muted']}; font-size: 0.9rem;">Cauliflower leaf pathology imagery</p>
                     </div>
                 </div>
@@ -165,61 +162,19 @@ def show():
 
     render_sample_gallery()
 
-    st.markdown("<div style='height: 2rem;'></div>", unsafe_allow_html=True)
-
-    # ==========================================================================
-    # DATASET INFORMATION & ATTRIBUTION SECTION
-    # ==========================================================================
-    st.markdown(
-        f"""
-        <div class="cc-card">
-            <h3 class="cc-card-title">Scientific Dataset Profile & Class Distribution Analysis</h3>
-            <p style="color: {THEME['text_muted']}; font-size: 0.95rem; line-height: 1.65; margin-bottom: 1.25rem;">
-                The benchmark corpus comprises <b>{stats['total']:,} verified cauliflower leaf images</b> 
-                spanning three distinct foliar states: <b>Healthy (934 images, {stats['percentages']['Healthy']:.1f}%)</b>, 
-                <b>Insect Hole (639 images, {stats['percentages']['Insect Hole']:.1f}%)</b>, and 
-                <b>Black Rot (1,088 images, {stats['percentages']['Black Rot']:.1f}%)</b>.
-            </p>
-            <div style="background: #F9FAF8; border: 1px solid #E2E7DF; border-radius: 8px; padding: 1.2rem; margin-bottom: 1.5rem;">
-                <h4 style="font-size: 1rem; color: {THEME['primary']}; margin-bottom: 0.4rem;">
-                    ⚖️ Class Imbalance Considerations in Training
-                </h4>
-                <p style="color: {THEME['text_main']}; font-size: 0.88rem; line-height: 1.6; margin: 0;">
-                    Black Rot represents the dominant pathological subset at 40.9% of the corpus, whereas Insect Hole 
-                    constitutes 24.0%. To mitigate predictive bias toward the majority class, rigorous cross-validation, 
-                    weighted focal/cross-entropy loss functions, and stratified data splitting are standard practices. 
-                    <i>Note: Local model training and evaluation splits (e.g. 70/15/15 or 80/20 train-test splits) 
-                    derive from this base corpus and may reflect differing split counts depending on researcher protocol.</i>
-                </p>
-            </div>
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <a href="{RESEARCH_PAPER_URL}" target="_blank" style="text-decoration: none;">
-                    <span style="display: inline-flex; align-items: center; gap: 6px; background-color: {THEME['primary']}; color: #FFFFFF; padding: 0.65rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.9rem;">
-                        📖 Read Research Paper (PMC)
-                    </span>
-                </a>
-                <a href="{DATASET_SOURCE_URL}" target="_blank" style="text-decoration: none;">
-                    <span style="display: inline-flex; align-items: center; gap: 6px; background-color: #FFFFFF; color: {THEME['primary']}; border: 1.5px solid {THEME['secondary']}; padding: 0.65rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.9rem;">
-                        💾 Access Mendeley Dataset
-                    </span>
-                </a>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
 
     # ==========================================================================
     # WORKFLOW SECTION
     # ==========================================================================
     st.markdown(
         f"""
-        <div style="margin-top: 2.25rem; margin-bottom: 1.25rem;">
+        <div style="margin-top: 1rem; margin-bottom: 1.25rem;">
             <h3 style="font-size: 1.45rem; color: {THEME['primary']}; margin-bottom: 0.35rem;">
                 Three-Step Diagnostic Workflow
             </h3>
             <p style="color: {THEME['text_muted']}; font-size: 0.92rem; margin: 0;">
-                How CauliCare AI assists agronomists and growers in seconds.
+                How CauliCare assists agronomists and growers in seconds.
             </p>
         </div>
         """,
@@ -231,9 +186,10 @@ def show():
     st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
     cta_col1, cta_col2, cta_col3 = st.columns([1, 1.5, 1])
     with cta_col2:
-        if st.button("🚀 Begin Leaf Disease Detection Now", key="home_final_cta", use_container_width=True):
+        if st.button("Begin Leaf Disease Detection Now", key="home_final_cta", use_container_width=True):
             st.switch_page("pages/detection.py")
 
 
 if __name__ == "__main__" or True:
     show()
+

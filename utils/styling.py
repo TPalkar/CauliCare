@@ -1,10 +1,11 @@
 """
-Styling utility module for CauliCare AI.
+Styling utility module for CauliCare.
 Injects custom AgriTech CSS, renders UI components, and ensures consistent visual identity.
 """
 
-import streamlit as st
+import base64
 from pathlib import Path
+import streamlit as st
 from config.settings import ASSETS_DIR, THEME
 
 
@@ -23,24 +24,44 @@ def apply_custom_css():
         st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
 
-def render_header(subtitle: str = "AI-powered cauliflower leaf health analysis"):
+def render_header(subtitle: str = "Cauliflower leaf health analysis"):
     """
-    Renders the unified header banner with project branding and leaf logo.
+    Renders the unified header banner with CauliCare branding and preserved logo artwork.
+    Main heading: CauliCare.
+    Status badge removed completely for a clean, professional aesthetic.
     """
+    logo_path = ASSETS_DIR / "logo.png"
+    if logo_path.exists():
+        try:
+            with open(logo_path, "rb") as f:
+                logo_b64 = base64.b64encode(f.read()).decode("utf-8")
+            logo_element = (
+                f'<img src="data:image/png;base64,{logo_b64}" alt="CauliCare Logo" '
+                f'style="width: 44px; height: 44px; border-radius: 8px; object-fit: contain; '
+                f'box-shadow: 0 2px 6px rgba(23,63,53,0.15);">'
+            )
+        except Exception:
+            logo_element = (
+                f'<div style="width: 44px; height: 44px; background: {THEME["primary"]}; '
+                f'border-radius: 8px; display: flex; align-items: center; justify-content: center; '
+                f'color: #FFFFFF; font-weight: 700; font-size: 1.1rem;">CC</div>'
+            )
+    else:
+        logo_element = (
+            f'<div style="width: 44px; height: 44px; background: {THEME["primary"]}; '
+            f'border-radius: 8px; display: flex; align-items: center; justify-content: center; '
+            f'color: #FFFFFF; font-weight: 700; font-size: 1.1rem;">CC</div>'
+        )
+
     st.markdown(
         f"""
         <div class="cc-navbar-header">
             <div class="cc-brand-badge">
-                <div style="width: 44px; height: 44px; background: {THEME['primary']}; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: {THEME['light_leaf']}; font-size: 22px; font-weight: bold; box-shadow: 0 2px 6px rgba(23,63,53,0.2);">
-                    🌿
-                </div>
+                {logo_element}
                 <div>
-                    <h2 class="cc-brand-title">CauliCare AI</h2>
+                    <h2 class="cc-brand-title">CauliCare</h2>
                     <p class="cc-brand-sub">{subtitle}</p>
                 </div>
-            </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <span class="cc-badge cc-badge-success">● System Operational</span>
             </div>
         </div>
         """,
@@ -70,11 +91,10 @@ def render_badge(text: str, variant: str = "neutral") -> str:
 
 
 def render_callout(text: str, variant: str = "info") -> str:
-    """Returns an HTML callout container."""
-    icon = "ℹ️" if variant == "info" else "⚠️"
+    """Returns an HTML callout container with clean border accent and no decorative emojis."""
     return f"""
     <div class="cc-callout cc-callout-{variant}">
-        <span style="font-size: 1.1rem; line-height: 1;">{icon}</span>
         <div>{text}</div>
     </div>
     """
+

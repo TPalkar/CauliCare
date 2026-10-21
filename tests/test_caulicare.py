@@ -1,5 +1,5 @@
 """
-Automated unit and integration test suite for CauliCare AI.
+Automated unit and integration test suite for CauliCare.
 Validates preprocessing, class-index mappings, missing checkpoint fallbacks,
 evaluation metrics loader, Grad-CAM error handling, and report generation.
 """
@@ -120,7 +120,7 @@ class TestCauliCarePipeline(unittest.TestCase):
             }
         }
         report = generate_text_report(mock_result, uploaded_filename="field_specimen.jpg")
-        self.assertIn("CAULICARE AI - CROP HEALTH INSPECTION REPORT", report)
+        self.assertIn("CAULICARE - CROP HEALTH INSPECTION REPORT", report)
         self.assertIn("Black Rot", report)
         self.assertIn("89.50%", report)
         self.assertIn("Xanthomonas campestris", report)

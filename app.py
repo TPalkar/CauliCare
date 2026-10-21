@@ -1,20 +1,25 @@
 """
-CauliCare AI - Main Streamlit Application Entrypoint
+CauliCare - Main Streamlit Application Entrypoint
 Multi-page routing using Streamlit st.navigation and st.Page APIs.
 Integrates AgriTech branding, session state persistence, and responsive styling.
 """
 
+from pathlib import Path
 import streamlit as st
-from config.settings import DEFAULT_PRODUCTION_MODEL
+from PIL import Image
+from config.settings import DEFAULT_PRODUCTION_MODEL, ASSETS_DIR
 from components.navigation import render_sidebar
 from utils.styling import apply_custom_css
 
 # ==============================================================================
 # STREAMLIT PAGE CONFIGURATION
 # ==============================================================================
+logo_path = ASSETS_DIR / "logo.png"
+fav_icon = Image.open(logo_path) if logo_path.exists() else None
+
 st.set_page_config(
-    page_title="CauliCare AI — Cauliflower Disease Classification",
-    page_icon="🌿",
+    page_title="CauliCare — Cauliflower Disease Classification",
+    page_icon=fav_icon,
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -38,12 +43,12 @@ if "selected_model" not in st.session_state:
 apply_custom_css()
 
 # ==============================================================================
-# MULTI-PAGE ROUTING DEFINITION
+# MULTI-PAGE ROUTING DEFINITION (Clean typography, no decorative emojis)
 # ==============================================================================
 home_page = st.Page(
     "pages/home.py",
     title="Home",
-    icon="🏠",
+    icon=None,
     default=True,
     url_path=""
 )
@@ -51,14 +56,14 @@ home_page = st.Page(
 detection_page = st.Page(
     "pages/detection.py",
     title="Disease Detection",
-    icon="🔬",
+    icon=None,
     url_path="detect"
 )
 
 comparison_page = st.Page(
     "pages/model_comparison.py",
     title="Model Comparison",
-    icon="📊",
+    icon=None,
     url_path="models"
 )
 
@@ -67,7 +72,7 @@ comparison_page = st.Page(
 results_page = st.Page(
     "pages/results.py",
     title="Prediction Results",
-    icon="📋",
+    icon=None,
     url_path="results",
     visibility="hidden"
 )
@@ -82,3 +87,4 @@ render_sidebar()
 
 # Run the selected page
 pg.run()
+

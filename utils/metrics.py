@@ -195,7 +195,7 @@ def determine_selected_model(metrics: Dict[str, Dict[str, Any]]) -> Dict[str, An
         "status_text": f"Production Architecture: {DEFAULT_PRODUCTION_MODEL}",
         "rationale": (
             f"<b>{DEFAULT_PRODUCTION_MODEL}</b> is selected as the primary production architecture "
-            f"for CauliCare AI. Fine-tuning the top 30 layers increased test accuracy to <b>{mob_acc*100:.2f}%</b> "
+            f"for CauliCare. Fine-tuning the top 30 layers increased test accuracy to <b>{mob_acc*100:.2f}%</b> "
             f"(up from 77.00% baseline). Its inverted residual bottlenecks require only <b>14.2 MB</b> of storage "
             f"and 3.5M parameters, making it ideal for edge smartphone field scouting. "
             f"Meanwhile, <b>EfficientNet-B0</b> achieved <b>{eff_acc*100:.2f}%</b> test accuracy on the same 400 test images, "

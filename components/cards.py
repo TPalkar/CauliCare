@@ -1,5 +1,5 @@
 """
-Reusable UI card components for CauliCare AI.
+Reusable UI card components for CauliCare.
 Provides AgriTech metric cards, workflow steps, disease information cards,
 and model summary cards.
 """
@@ -96,7 +96,7 @@ def render_workflow_steps():
             """
             <div class="cc-step-card">
                 <div class="cc-step-num">2</div>
-                <div class="cc-step-title">Run AI Inference</div>
+                <div class="cc-step-title">Run Inference</div>
                 <div class="cc-step-text">Deep neural backbone extracts multi-scale feature representations to detect lesions.</div>
             </div>
             """,
@@ -139,7 +139,7 @@ def render_model_summary_card(
     size_str = f"{size_mb:.1f} MB" if size_mb is not None else "Unmeasured"
     lat_str = f"{latency:.1f} ms" if latency is not None else "Unmeasured"
 
-    selected_badge = render_badge("★ Production Model", "success") if is_selected else render_badge("Candidate Architecture", "neutral")
+    selected_badge = render_badge("Production Model", "success") if is_selected else render_badge("Candidate Architecture", "neutral")
 
     st.markdown(
         f"""

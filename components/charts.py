@@ -1,5 +1,5 @@
 """
-Interactive Plotly charts module for CauliCare AI.
+Interactive Plotly charts module for CauliCare.
 Provides dataset distribution charts, prediction probability breakdowns,
 model comparison bars, confusion matrices, and training curves.
 Compatible with modern Plotly layout APIs.

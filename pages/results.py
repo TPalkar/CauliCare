@@ -1,5 +1,5 @@
 """
-CauliCare AI - Prediction Results Page
+CauliCare - Prediction Results Page
 Displays deep learning classification outcome, confidence calibration,
 probability distribution chart, agronomic disease details, and downloadable diagnostic report.
 """
@@ -32,7 +32,6 @@ def show():
         st.markdown(
             f"""
             <div class="cc-card" style="text-align: center; padding: 3.5rem 2rem;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">🍃</div>
                 <h2 style="color: {THEME['primary']}; margin-bottom: 0.5rem;">No Active Leaf Analysis</h2>
                 <p style="color: {THEME['text_muted']}; max-width: 520px; margin: 0 auto 1.75rem auto;">
                     You have not submitted a leaf photograph for inspection yet, or the previous session expired.
@@ -45,7 +44,7 @@ def show():
 
         col1, col2, col3 = st.columns([1, 1.2, 1])
         with col2:
-            if st.button("🔍 Go to Disease Detection", key="empty_state_detect_btn", use_container_width=True):
+            if st.button("Go to Disease Detection", key="empty_state_detect_btn", use_container_width=True):
                 st.switch_page("pages/detection.py")
         return
 
@@ -111,7 +110,7 @@ def show():
         byte_im = buf.getvalue()
 
         st.download_button(
-            label="💾 Download Original Specimen",
+            label="Download Original Specimen",
             data=byte_im,
             file_name=f"specimen_{image_name}",
             mime="image/jpeg",
@@ -190,7 +189,7 @@ def show():
     st.markdown(
         f"""
         <div class="cc-card">
-            <h3 class="cc-card-title">🔬 Pathological Overview & Field Management Protocol</h3>
+            <h3 class="cc-card-title">Pathological Overview & Field Management Protocol</h3>
             <p style="color: {THEME['text_main']}; font-size: 0.95rem; line-height: 1.65; margin-bottom: 1.25rem;">
                 {disease_data.get('overview', '')}
             </p>
@@ -204,7 +203,7 @@ def show():
             f"""
             <div style="background: #F9FAF8; border: 1px solid #E2E7DF; border-radius: 8px; padding: 1rem; height: 100%;">
                 <h4 style="font-size: 0.95rem; color: {THEME['primary']}; margin-bottom: 0.6rem;">
-                    🔍 Characteristic Clinical Symptoms
+                    Characteristic Clinical Symptoms
                 </h4>
                 <ul style="padding-left: 1.25rem; font-size: 0.88rem; color: {THEME['text_main']}; margin: 0; line-height: 1.65;">
             """,
@@ -219,7 +218,7 @@ def show():
             f"""
             <div style="background: #F9FAF8; border: 1px solid #E2E7DF; border-radius: 8px; padding: 1rem; height: 100%;">
                 <h4 style="font-size: 0.95rem; color: {THEME['primary']}; margin-bottom: 0.6rem;">
-                    🛡️ Agronomic Management Recommendations
+                    Agronomic Management Recommendations
                 </h4>
                 <ul style="padding-left: 1.25rem; font-size: 0.88rem; color: {THEME['text_main']}; margin: 0; line-height: 1.65;">
             """,
@@ -237,7 +236,7 @@ def show():
     act_col1, act_col2, act_col3 = st.columns([1, 1, 1.2])
 
     with act_col1:
-        if st.button("🔄 Analyse Another Image", key="analyse_another_btn", use_container_width=True):
+        if st.button("Analyse Another Image", key="analyse_another_btn", use_container_width=True):
             if "prediction_result" in st.session_state:
                 del st.session_state["prediction_result"]
             if "uploaded_image" in st.session_state:
@@ -245,14 +244,14 @@ def show():
             st.switch_page("pages/detection.py")
 
     with act_col2:
-        if st.button("🏠 Back to Home", key="back_home_btn", use_container_width=True):
+        if st.button("Back to Home", key="back_home_btn", use_container_width=True):
             st.switch_page("pages/home.py")
 
     with act_col3:
         # Generate diagnostic text report for agronomic records
         report_text = generate_text_report(result, uploaded_filename=image_name)
         st.download_button(
-            label="📄 Download Diagnostic Report",
+            label="Download Diagnostic Report",
             data=report_text,
             file_name=f"caulicare_report_{predicted_class.lower().replace(' ', '_')}.txt",
             mime="text/plain",
@@ -263,3 +262,4 @@ def show():
 
 if __name__ == "__main__" or True:
     show()
+

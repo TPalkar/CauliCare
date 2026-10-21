@@ -1,5 +1,5 @@
 """
-Dataset sample gallery component for CauliCare AI.
+Dataset sample gallery component for CauliCare.
 Displays representative category samples discovered from the dataset directory.
 """
 
@@ -48,9 +48,8 @@ def render_sample_gallery():
                 st.markdown(
                     f"""
                     <div style="height: 180px; background: #F5F4E9; border: 1.5px dashed #CCD7C7; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12px; margin-bottom: 8px;">
-                        <span style="font-size: 1.8rem;">🌿</span>
-                        <div style="font-size: 0.82rem; font-weight: 600; color: {THEME['primary']}; margin-top: 4px;">{label} Specimen</div>
-                        <div style="font-size: 0.72rem; color: {THEME['text_muted']}; margin-top: 2px;">Place image in <code>data/samples/</code></div>
+                        <div style="font-size: 0.88rem; font-weight: 700; color: {THEME['primary']};">{label} Specimen</div>
+                        <div style="font-size: 0.72rem; color: {THEME['text_muted']}; margin-top: 4px;">Place image in <code>data/samples/</code></div>
                     </div>
                     """,
                     unsafe_allow_html=True

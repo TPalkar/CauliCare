@@ -4,7 +4,7 @@ This directory houses trained TensorFlow / Keras deep learning checkpoints for c
 
 ## Production & Benchmark Models
 
-CauliCare AI uses **TensorFlow / Keras** with MobileNetV2 as the primary production architecture:
+CauliCare uses **TensorFlow / Keras** with MobileNetV2 as the primary production architecture:
 
 | Architecture | Framework | Expected File Path | Source Script | Status |
 | :--- | :--- | :--- | :--- | :--- |
