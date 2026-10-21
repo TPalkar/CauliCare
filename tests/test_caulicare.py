@@ -81,21 +81,40 @@ class TestCauliCarePipeline(unittest.TestCase):
         metrics = load_all_model_metrics()
         self.assertIn("MobileNetV2", metrics)
         self.assertIn("EfficientNet", metrics)
+        self.assertIn("ResNet", metrics)
         mob = metrics["MobileNetV2"]
         eff = metrics["EfficientNet"]
+        res = metrics["ResNet"]
 
         self.assertAlmostEqual(mob["accuracy"], 0.7950, places=4)
         self.assertAlmostEqual(eff["accuracy"], 0.8125, places=4)
+        self.assertAlmostEqual(res["accuracy"], 0.7975, places=4)
         self.assertEqual(eff["support"], 400)
+        self.assertEqual(res["support"], 400)
         self.assertAlmostEqual(eff["f1_score"], 0.8139, places=4)
+        self.assertAlmostEqual(res["f1_score"], 0.7959, places=4)
 
         # Verify selection info recognizes MobileNetV2 as production pipeline
         selection = determine_selected_model(metrics)
         self.assertEqual(selection["selected_model"], DEFAULT_PRODUCTION_MODEL)
 
+    def test_live_inference_and_gradcam(self):
+        """Verify real inference and dynamic Grad-CAM on sample leaf image across models."""
+        self.assertTrue(is_model_available("MobileNetV2"))
+        self.assertTrue(is_model_available("EfficientNet"))
+        self.assertTrue(is_model_available("ResNet"))
+
+        test_img = Image.open("data/samples/healthy_sample.jpg")
+        res = run_prediction(test_img, model_name="MobileNetV2")
+        self.assertTrue(res["success"])
+        self.assertEqual(res["predicted_class"], "Healthy")
+        self.assertIn("gradcam", res)
+        self.assertIsNotNone(res["gradcam"])
+        self.assertIsNotNone(res["gradcam"]["overlay"])
+
     def test_gradcam_overlay_and_safety(self):
         """Verify overlay generation with synthetic heatmap and error handling."""
-        safe_result = generate_gradcam_heatmap(None, np.zeros((1, 224, 224, 3)))
+        safe_result = generate_gradcam_heatmap(None, None)
         self.assertIsNone(safe_result)
 
         dummy_leaf = Image.new("RGB", (100, 100), color=(60, 180, 60))

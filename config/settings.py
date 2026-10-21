@@ -129,9 +129,11 @@ MODEL_CONFIGS: Dict[str, Dict[str, Any]] = {
         "input_size": (224, 224),
         "target_conv_layer": "conv5_block3_out",
         "checkpoints": [
+            MODELS_DIR / "resnet50_best.keras",
             MODELS_DIR / "resnet50_cauliflower.keras",
+            MODELS_DIR / "resnet50_final.keras",
         ],
-        "default_checkpoint": MODELS_DIR / "resnet50_cauliflower.keras",
+        "default_checkpoint": MODELS_DIR / "resnet50_best.keras",
     },
 }
 

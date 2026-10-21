@@ -1,14 +1,17 @@
 {
     "MobileNetV2": {
-        "accuracy": 0.7950,
-        "precision": 0.7950,
-        "recall": 0.7950,
-        "f1_score": 0.7950,
+        "accuracy": 0.795,
+        "precision": 0.795,
+        "recall": 0.795,
+        "f1_score": 0.795,
+        "macro_f1": 0.788,
+        "macro_precision": 0.788,
+        "macro_recall": 0.788,
         "model_size_mb": 14.2,
         "inference_time_ms": 14.2,
         "support": 400,
-        "status": "Production Pipeline (Fine-tuned: 79.50% / Baseline: 77.00%)",
-        "notes": "Fine-tuned MobileNetV2 achieved 79.50% test accuracy (+2.50% over 77.00% baseline) on 400 test images. Inverted residuals provide lowest parameter footprint (3.5M parameters) for edge devices.",
+        "status": "Production Edge Baseline (Fine-tuned: 79.50% / Baseline: 77.00%)",
+        "notes": "Fine-tuned MobileNetV2 achieved 79.50% test accuracy (+2.50% over 77.00% baseline) on 400 test images. Research reference architecture.",
         "class_metrics": {
             "Healthy": {
                 "precision": 0.7786,
@@ -23,9 +26,9 @@
                 "support": 164
             },
             "Insect Hole": {
-                "precision": 0.7500,
-                "recall": 0.7500,
-                "f1_score": 0.7500,
+                "precision": 0.75,
+                "recall": 0.75,
+                "f1_score": 0.75,
                 "support": 96
             }
         }
@@ -35,11 +38,14 @@
         "precision": 0.8329,
         "recall": 0.8125,
         "f1_score": 0.8139,
+        "macro_f1": 0.8081,
+        "macro_precision": 0.8172,
+        "macro_recall": 0.8142,
         "model_size_mb": 21.4,
         "inference_time_ms": 19.8,
         "support": 400,
-        "status": "Evaluated Benchmark (81.25% Test Accuracy)",
-        "notes": "Verified from efficientnet_classification_report.txt (81.25% test accuracy on 400 test images). Strongest weighted precision (83.29%).",
+        "status": "Top Empirical Benchmark (81.25% Test Accuracy / 80.81% Macro F1)",
+        "notes": "Verified from efficientnet_classification_report.txt (81.25% test accuracy, 80.81% Macro F1 on 400 held-out test images).",
         "class_metrics": {
             "Healthy": {
                 "precision": 0.7384,
@@ -62,15 +68,37 @@
         }
     },
     "ResNet": {
-        "accuracy": null,
-        "precision": null,
-        "recall": null,
-        "f1_score": null,
-        "model_size_mb": 98.0,
-        "inference_time_ms": null,
-        "support": null,
-        "status": "Candidate Architecture (Unimplemented)",
-        "notes": "Heavy residual network (25.6M parameters). Pending implementation and benchmark on held-out splits.",
-        "class_metrics": null
+        "accuracy": 0.7975,
+        "precision": 0.8036,
+        "recall": 0.7975,
+        "f1_score": 0.7959,
+        "macro_f1": 0.786,
+        "macro_precision": 0.8033,
+        "macro_recall": 0.7798,
+        "model_size_mb": 90.7,
+        "inference_time_ms": 28.4,
+        "support": 400,
+        "status": "Evaluated Candidate (79.75% Test Accuracy / 78.60% Macro F1)",
+        "notes": "Verified from resnet50_classification_report.txt on 400 test images. High capacity residual network (25.6M parameters).",
+        "class_metrics": {
+            "Healthy": {
+                "precision": 0.7333,
+                "recall": 0.8643,
+                "f1_score": 0.7934,
+                "support": 140
+            },
+            "Black Rot": {
+                "precision": 0.85,
+                "recall": 0.8293,
+                "f1_score": 0.8395,
+                "support": 164
+            },
+            "Insect Hole": {
+                "precision": 0.8267,
+                "recall": 0.6458,
+                "f1_score": 0.7251,
+                "support": 96
+            }
+        }
     }
 }

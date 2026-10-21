@@ -40,34 +40,39 @@ def show():
         unsafe_allow_html=True
     )
 
-    # Production Model Status Banner
-    is_avail = is_model_available(DEFAULT_PRODUCTION_MODEL)
-    weights_path = get_model_path(DEFAULT_PRODUCTION_MODEL)
+    # Model Selection & Status
+    current_model = st.session_state.get("selected_model", DEFAULT_PRODUCTION_MODEL)
+    if current_model not in SUPPORTED_MODELS:
+        current_model = DEFAULT_PRODUCTION_MODEL
 
-    model_status_badge = (
-        render_badge("Weights Configured & Ready", "success")
-        if is_avail
-        else render_badge("Weights Unconfigured (Pending)", "warning")
-    )
+    col_sel1, col_sel2 = st.columns([1.2, 0.8])
+    with col_sel1:
+        chosen_model = st.selectbox(
+            "Classification Architecture",
+            SUPPORTED_MODELS,
+            index=SUPPORTED_MODELS.index(current_model),
+            key="arch_select_box",
+            help="Select among verified architectures: MobileNetV2 (Edge Baseline), EfficientNet-B0 (81.25% Test Accuracy), and ResNet-50 (Deep Residual)."
+        )
+        st.session_state["selected_model"] = chosen_model
 
-    st.markdown(
-        f"""
-        <div style="background: #FFFFFF; border: 1px solid #E2E7DF; border-radius: 10px; padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <div>
-                <span style="font-size: 0.85rem; color: {THEME['text_muted']}; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">
-                    Active Production Model
-                </span>
-                <div style="font-size: 1.15rem; font-weight: 700; color: {THEME['primary']};">
-                    {DEFAULT_PRODUCTION_MODEL} Architecture
-                </div>
-            </div>
-            <div>
+    is_avail = is_model_available(chosen_model)
+    weights_path = get_model_path(chosen_model)
+
+    with col_sel2:
+        model_status_badge = (
+            render_badge(f"{chosen_model} Weights Ready", "success")
+            if is_avail
+            else render_badge(f"{chosen_model} Pending", "warning")
+        )
+        st.markdown(
+            f"""
+            <div style="padding-top: 1.7rem; text-align: right;">
                 {model_status_badge}
             </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+            """,
+            unsafe_allow_html=True
+        )
 
     # Layout: Upload & Controls on Left, Guidelines & Specs on Right
     left_col, right_col = st.columns([1.2, 0.8], gap="large")
@@ -163,13 +168,13 @@ def show():
             st.markdown("<div style='height: 0.75rem;'></div>", unsafe_allow_html=True)
             if st.button("Analyse Image", key="run_inference_btn", use_container_width=True):
                 with st.spinner("Executing neural inference and computing probability spectrum..."):
-                    result = run_prediction(active_image, model_name=DEFAULT_PRODUCTION_MODEL)
+                    result = run_prediction(active_image, model_name=chosen_model)
 
                     if result.get("success"):
                         st.session_state["uploaded_image"] = active_image
                         st.session_state["uploaded_image_name"] = image_name
                         st.session_state["prediction_result"] = result
-                        st.session_state["selected_model"] = DEFAULT_PRODUCTION_MODEL
+                        st.session_state["selected_model"] = chosen_model
                         st.switch_page("pages/results.py")
                     else:
                         st.session_state["last_inference_error"] = result.get("message")
@@ -208,7 +213,7 @@ def show():
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #EEF2EC;">
                         <span style="color: {THEME['text_muted']};">Channel Normalization:</span>
-                        <b>MobileNetV2 Standard (-1 to 1)</b>
+                        <b>{chosen_model} Preprocessing</b>
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #EEF2EC;">
                         <span style="color: {THEME['text_muted']};">Class Index Order:</span>
@@ -216,7 +221,7 @@ def show():
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: 6px 0;">
                         <span style="color: {THEME['text_muted']};">Active Checkpoint:</span>
-                        <code>models/caulicare_finetuned.keras</code>
+                        <code>models/{weights_path.name}</code>
                     </div>
                 </div>
             </div>
@@ -229,7 +234,7 @@ def show():
                 f"""
                 <div style="background: #FFFBEB; border: 1.5px solid #FDE68A; border-radius: 10px; padding: 1rem; font-size: 0.86rem; color: #92400E;">
                     <b>Missing Weights Guidance:</b><br>
-                    Trained weights are currently pending for <code>{DEFAULT_PRODUCTION_MODEL}</code>. 
+                    Trained weights are currently pending for <code>{chosen_model}</code>. 
                     Place your fine-tuned <code>.keras</code> file inside the <code>models/</code> folder to activate real-time inference.
                 </div>
                 """,

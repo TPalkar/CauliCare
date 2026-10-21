@@ -14,6 +14,7 @@ import tensorflow as tf
 from config.settings import CLASS_NAMES, DEFAULT_PRODUCTION_MODEL
 from utils.preprocessing import preprocess_image_tensor
 from utils.model_loader import load_trained_model, is_model_available, find_available_checkpoint
+from utils.gradcam import generate_dynamic_gradcam
 
 
 def run_prediction(image: Image.Image, model_name: str = DEFAULT_PRODUCTION_MODEL) -> Dict[str, Any]:
@@ -71,6 +72,9 @@ def run_prediction(image: Image.Image, model_name: str = DEFAULT_PRODUCTION_MODE
         predicted_class = CLASS_NAMES[top_idx]
         confidence = float(output_probs[top_idx])
 
+        # Generate real dynamic Grad-CAM explanation for the predicted class
+        gradcam_data = generate_dynamic_gradcam(model, image, model_name, pred_index=top_idx)
+
         return {
             "success": True,
             "predicted_class": predicted_class,
@@ -81,6 +85,7 @@ def run_prediction(image: Image.Image, model_name: str = DEFAULT_PRODUCTION_MODE
             "inference_time_ms": round(latency_ms, 2),
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "image_size": image.size,
+            "gradcam": gradcam_data,
         }
     except Exception as e:
         return {

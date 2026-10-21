@@ -16,14 +16,16 @@ from config.settings import (
 
 def get_candidate_checkpoints(model_name: str) -> List[Path]:
     """Returns candidate checkpoint paths for the given model architecture."""
-    cfg = MODEL_CONFIGS.get(model_name, MODEL_CONFIGS[DEFAULT_PRODUCTION_MODEL])
-    return cfg.get("checkpoints", [MODELS_DIR / f"{model_name.lower()}_cauliflower.keras"])
+    if model_name in MODEL_CONFIGS:
+        return MODEL_CONFIGS[model_name].get("checkpoints", [])
+    return [MODELS_DIR / f"{model_name.lower()}_cauliflower.keras"]
 
 
 def get_model_path(model_name: str) -> Path:
     """Returns the primary expected checkpoint path for the given model architecture."""
-    cfg = MODEL_CONFIGS.get(model_name, MODEL_CONFIGS[DEFAULT_PRODUCTION_MODEL])
-    return cfg.get("default_checkpoint", MODELS_DIR / f"{model_name.lower()}_cauliflower.keras")
+    if model_name in MODEL_CONFIGS:
+        return MODEL_CONFIGS[model_name].get("default_checkpoint", MODELS_DIR / f"{model_name.lower()}_cauliflower.keras")
+    return MODELS_DIR / f"{model_name.lower()}_cauliflower.keras"
 
 
 def find_available_checkpoint(model_name: str) -> Optional[Path]:

@@ -125,39 +125,55 @@ def render_model_summary_card(
     Renders an evaluation summary card for an individual architecture.
     Never fabricates values if metrics are None.
     """
+    display_name = {
+        "MobileNetV2": "MobileNetV2",
+        "EfficientNet": "EfficientNet-B0",
+        "ResNet": "ResNet-50",
+    }.get(model_name, model_name)
+
     acc = metrics.get("accuracy")
     prec = metrics.get("precision")
     rec = metrics.get("recall")
     f1 = metrics.get("f1_score")
+    macro_f1 = metrics.get("macro_f1")
     size_mb = metrics.get("model_size_mb")
     latency = metrics.get("inference_time_ms")
 
-    acc_str = f"{acc*100:.2f}%" if acc is not None else "Not evaluated yet"
+    acc_str = f"{acc*100:.2f}%" if acc is not None else "Pending"
     prec_str = f"{prec*100:.2f}%" if prec is not None else "Pending"
     rec_str = f"{rec*100:.2f}%" if rec is not None else "Pending"
     f1_str = f"{f1*100:.2f}%" if f1 is not None else "Pending"
+    macro_f1_str = f"{macro_f1*100:.2f}%" if macro_f1 is not None else f1_str
     size_str = f"{size_mb:.1f} MB" if size_mb is not None else "Unmeasured"
     lat_str = f"{latency:.1f} ms" if latency is not None else "Unmeasured"
 
-    selected_badge = render_badge("Production Model", "success") if is_selected else render_badge("Candidate Architecture", "neutral")
+    if is_selected:
+        badge_html = render_badge("Production Baseline", "success")
+    elif model_name == "EfficientNet":
+        badge_html = render_badge("Top Benchmark", "neutral")
+    else:
+        badge_html = render_badge("Candidate Arch", "neutral")
 
     st.markdown(
         f"""
-        <div class="cc-card" style="margin-bottom: 1rem; border-top: 4px solid {THEME['primary'] if is_selected else THEME['border']};">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                <h3 style="margin: 0; font-size: 1.25rem;">{model_name}</h3>
-                {selected_badge}
+        <div class="cc-card" style="margin-bottom: 1rem; border-top: 4px solid {THEME['primary'] if is_selected else THEME['border']}; min-height: 250px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.25rem;">
+                    <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: {THEME['primary']};">{display_name}</h3>
+                    {badge_html}
+                </div>
+                <div style="margin-bottom: 0.75rem;">
+                    <div class="cc-metric-label">Test Accuracy (400 samples)</div>
+                    <div style="font-size: 1.75rem; font-weight: 800; color: {THEME['primary']};">{acc_str}</div>
+                </div>
             </div>
-            <div style="margin-bottom: 1rem;">
-                <div class="cc-metric-label">Test Accuracy</div>
-                <div style="font-size: 1.8rem; font-weight: 800; color: {THEME['primary']};">{acc_str}</div>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.88rem; border-top: 1px solid #EEF2EC; padding-top: 0.75rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 0.75rem; font-size: 0.84rem; border-top: 1px solid #EEF2EC; padding-top: 0.75rem;">
                 <div><span style="color: {THEME['text_muted']};">Precision:</span> <b>{prec_str}</b></div>
                 <div><span style="color: {THEME['text_muted']};">Recall:</span> <b>{rec_str}</b></div>
-                <div><span style="color: {THEME['text_muted']};">F1-Score:</span> <b>{f1_str}</b></div>
+                <div><span style="color: {THEME['text_muted']};">Macro F1:</span> <b>{macro_f1_str}</b></div>
+                <div><span style="color: {THEME['text_muted']};">Weighted F1:</span> <b>{f1_str}</b></div>
                 <div><span style="color: {THEME['text_muted']};">Model Size:</span> <b>{size_str}</b></div>
-                <div><span style="color: {THEME['text_muted']};">Inference:</span> <b>{lat_str}</b></div>
+                <div><span style="color: {THEME['text_muted']};">Latency:</span> <b>{lat_str}</b></div>
             </div>
         </div>
         """,

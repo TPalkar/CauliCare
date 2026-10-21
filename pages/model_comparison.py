@@ -4,6 +4,7 @@ Compares MobileNetV2, EfficientNet-B0, and ResNet-50 across empirical accuracy,
 parameter scale, latency, confusion matrices, training histories, and Grad-CAM interpretability.
 """
 
+import textwrap
 from pathlib import Path
 import streamlit as st
 from PIL import Image
@@ -219,7 +220,7 @@ def show():
         <div class="cc-card">
             <h3 class="cc-card-title">Training & Validation Dynamics</h3>
             <p class="cc-card-desc">
-                Inspect convergence rates, loss stabilization, and overfitting margins across epochs.
+                Inspect convergence curves, loss stabilization, and generalization margins across training epochs.
             </p>
         """,
         unsafe_allow_html=True
@@ -229,7 +230,24 @@ def show():
     for idx, model_name in enumerate(SUPPORTED_MODELS):
         with hist_tabs[idx]:
             history = load_training_history(model_name)
-            if history:
+            if history and "train_acc" in history:
+                # Summary metrics row
+                best_epoch = history.get("best_epoch", "N/A")
+                best_val = history.get("best_val_acc")
+                best_val_str = f"{best_val*100:.2f}%" if best_val is not None else "N/A"
+                tot_epochs = history.get("total_epochs", len(history.get("train_acc", [])))
+
+                st.markdown(
+                    f"""
+                    <div style="display: flex; gap: 1.5rem; background: #F9FAF8; border: 1px solid #E2E7DF; border-radius: 8px; padding: 0.75rem 1.25rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                        <div><span style="color: {THEME['text_muted']}; font-size: 0.8rem;">Total Epochs:</span> <b style="color: {THEME['primary']};">{tot_epochs}</b></div>
+                        <div><span style="color: {THEME['text_muted']}; font-size: 0.8rem;">Best Epoch:</span> <b style="color: {THEME['primary']};">Epoch {best_epoch}</b></div>
+                        <div><span style="color: {THEME['text_muted']}; font-size: 0.8rem;">Peak Val Accuracy:</span> <b style="color: {THEME['success']};">{best_val_str}</b></div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
                 curve_fig = create_training_curves(history)
                 if curve_fig:
                     st.plotly_chart(curve_fig, use_container_width=True, config={"displayModeBar": False})
@@ -241,7 +259,7 @@ def show():
                             {model_name} Training History Unrecorded
                         </div>
                         <div style="font-size: 0.85rem; color: {THEME['text_muted']}; margin-top: 0.25rem;">
-                            Run <code>python train.py</code> to produce <code>training_history.csv</code>.
+                            Run training script to record <code>history.csv</code>.
                         </div>
                     </div>
                     """,
@@ -274,14 +292,14 @@ def show():
         with gradcam_tabs[idx]:
             cam_assets = discover_gradcam_artifacts(model_name)
 
-            if cam_assets["overlay"] and cam_assets["overlay"].exists():
+            if cam_assets.get("overlay") and Path(cam_assets["overlay"]).exists():
                 g_col1, g_col2, g_col3 = st.columns(3)
                 with g_col1:
-                    if cam_assets["original"]:
-                        st.image(Image.open(cam_assets["original"]), caption="Original Leaf", use_container_width=True)
+                    if cam_assets.get("original") and Path(cam_assets["original"]).exists():
+                        st.image(Image.open(cam_assets["original"]), caption="Original Leaf Specimen", use_container_width=True)
                 with g_col2:
-                    if cam_assets["heatmap"]:
-                        st.image(Image.open(cam_assets["heatmap"]), caption="Grad-CAM Activation", use_container_width=True)
+                    if cam_assets.get("heatmap") and Path(cam_assets["heatmap"]).exists():
+                        st.image(Image.open(cam_assets["heatmap"]), caption="Grad-CAM Activation Map", use_container_width=True)
                 with g_col3:
                     st.image(Image.open(cam_assets["overlay"]), caption="Attention Overlay", use_container_width=True)
                 st.caption(f"Salient feature focus for {model_name} on leaf lamina.")
@@ -293,8 +311,7 @@ def show():
                             Grad-CAM Ready via Live Inference
                         </div>
                         <div style="font-size: 0.85rem; color: {THEME['text_muted']}; margin-top: 0.25rem; max-width: 520px; margin-left: auto; margin-right: auto;">
-                            Once a trained model is placed in <code>models/</code>, dynamic Grad-CAM heatmaps are computed 
-                            automatically on uploaded images using TensorFlow GradientTape on the final conv layer.
+                            Dynamic Grad-CAM heatmaps are computed live on uploaded images using TensorFlow GradientTape on the final conv layer.
                         </div>
                     </div>
                     """,
@@ -304,81 +321,94 @@ def show():
     st.markdown("</div>", unsafe_allow_html=True)
 
     # ==========================================================================
-    # SECTION F: MODEL COMPARISON TABLE
+    # SECTION F: MODEL COMPARISON TABLE (Rendered as single complete HTML block)
     # ==========================================================================
-    st.markdown(
-        f"""
-        <div class="cc-card">
-            <h3 class="cc-card-title">Comprehensive Architectural Comparison</h3>
-            <p class="cc-card-desc">Side-by-side benchmark metrics on cauliflower classification.</p>
-            <div style="overflow-x: auto;">
-                <table class="cc-table">
-                    <thead>
-                        <tr>
-                            <th>Model Architecture</th>
-                            <th>Test Accuracy</th>
-                            <th>Precision</th>
-                            <th>Recall</th>
-                            <th>F1-Score</th>
-                            <th>Model Size</th>
-                            <th>Framework</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        """,
-        unsafe_allow_html=True
-    )
-
-    table_rows = []
+    table_rows_html = []
     for model_name in SUPPORTED_MODELS:
         m = all_metrics.get(model_name, {})
-        acc_val = f"{m['accuracy']*100:.2f}%" if m.get("accuracy") is not None else "Pending Training"
-        prec_val = f"{m['precision']*100:.2f}%" if m.get("precision") is not None else "Pending"
-        rec_val = f"{m['recall']*100:.2f}%" if m.get("recall") is not None else "Pending"
-        f1_val = f"{m['f1_score']*100:.2f}%" if m.get("f1_score") is not None else "Pending"
+        display_name = {
+            "MobileNetV2": "MobileNetV2",
+            "EfficientNet": "EfficientNet-B0",
+            "ResNet": "ResNet-50",
+        }.get(model_name, model_name)
+
+        acc_val = f"{m['accuracy']*100:.2f}%" if m.get("accuracy") is not None else "Pending"
+        prec_val = f"{m.get('macro_precision', m.get('precision', 0))*100:.2f}%" if m.get("precision") is not None else "Pending"
+        rec_val = f"{m.get('macro_recall', m.get('recall', 0))*100:.2f}%" if m.get("recall") is not None else "Pending"
+        macro_f1_val = f"{m.get('macro_f1', m.get('f1_score', 0))*100:.2f}%" if m.get("macro_f1") is not None else "Pending"
+        weighted_f1_val = f"{m.get('f1_score', 0)*100:.2f}%" if m.get("f1_score") is not None else "Pending"
         size_val = f"{m['model_size_mb']:.1f} MB" if m.get("model_size_mb") is not None else "Unmeasured"
+        lat_val = f"{m['inference_time_ms']:.1f} ms" if m.get("inference_time_ms") is not None else "Unmeasured"
         framework_str = "TensorFlow / Keras"
-        status_str = m.get("status", "Candidate")
-        
-        table_rows.append(f"""
+        status_str = m.get("status", "Evaluated Candidate")
+
+        table_rows_html.append(f"""
             <tr>
-                <td><b>{model_name}</b></td>
-                <td>{acc_val}</td>
+                <td><b>{display_name}</b></td>
+                <td><b>{acc_val}</b></td>
                 <td>{prec_val}</td>
                 <td>{rec_val}</td>
-                <td>{f1_val}</td>
+                <td>{macro_f1_val}</td>
+                <td>{weighted_f1_val}</td>
                 <td>{size_val}</td>
+                <td>{lat_val}</td>
                 <td>{framework_str}</td>
                 <td><code>{status_str}</code></td>
             </tr>
         """)
 
-    st.markdown("".join(table_rows) + "</tbody></table></div></div>", unsafe_allow_html=True)
+    full_table_markup = textwrap.dedent(f"""
+    <div class="cc-card">
+        <h3 class="cc-card-title">Comprehensive Architectural Comparison</h3>
+        <p class="cc-card-desc">Standardized evaluation across the held-out cauliflower test split (400 images).</p>
+        <div style="overflow-x: auto; margin-top: 0.5rem;">
+            <table class="cc-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; padding: 10px 12px;">Architecture</th>
+                        <th style="text-align: left; padding: 10px 12px;">Test Accuracy</th>
+                        <th style="text-align: left; padding: 10px 12px;">Macro Precision</th>
+                        <th style="text-align: left; padding: 10px 12px;">Macro Recall</th>
+                        <th style="text-align: left; padding: 10px 12px;">Macro F1</th>
+                        <th style="text-align: left; padding: 10px 12px;">Weighted F1</th>
+                        <th style="text-align: left; padding: 10px 12px;">Model Size</th>
+                        <th style="text-align: left; padding: 10px 12px;">Latency</th>
+                        <th style="text-align: left; padding: 10px 12px;">Framework</th>
+                        <th style="text-align: left; padding: 10px 12px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {''.join(table_rows_html)}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    """)
+    st.markdown(full_table_markup, unsafe_allow_html=True)
 
     # ==========================================================================
     # SECTION G: SELECTED MODEL & JUSTIFICATION
     # ==========================================================================
     st.markdown(
-        f"""
+        textwrap.dedent(f"""
         <div class="cc-card" style="border-left: 5px solid {THEME['primary']}; background: #FFFFFF;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
                 <h3 style="font-size: 1.35rem; color: {THEME['primary']}; margin: 0;">
-                    Why We Selected MobileNetV2
+                    Production Selection Rationale & Agronomic Analysis
                 </h3>
                 {render_badge("Production Edge Pipeline", "success")}
             </div>
             <p style="color: {THEME['text_main']}; font-size: 0.95rem; line-height: 1.65; margin-bottom: 1rem;">
                 {selection_info['rationale']}
             </p>
-            <div style="background: #F9FAF8; border: 1px solid #E2E7DF; border-radius: 8px; padding: 1rem; font-size: 0.88rem; color: {THEME['text_muted']};">
+            <div style="background: #F9FAF8; border: 1px solid #E2E7DF; border-radius: 8px; padding: 1rem; font-size: 0.88rem; color: {THEME['text_main']}; line-height: 1.7;">
                 <b>Agronomic Deployment Trade-offs:</b><br>
-                • <b>MobileNetV2 (3.5M params, 14 MB):</b> Inverted residual bottlenecks minimize RAM and battery overhead on farmer smartphones and IoT field scouting traps.<br>
-                • <b>EfficientNet-B0 (5.3M params, 21 MB):</b> Compound scaling balances depth and resolution; benchmarked on 400 test images with 81.25% accuracy.<br>
-                • <b>ResNet-50 (25.6M params, 98 MB):</b> High representational capacity, but 7× larger file size, creating latency bottlenecks for low-connectivity rural deployment.
+                • <b>MobileNetV2 (3.5M params, 14.2 MB):</b> Baseline research architecture from the cited paper. With fine-tuning, it reaches <b>79.50%</b> test accuracy with balanced recall (75.0% on Insect Hole), making it optimal for offline field scouting on entry-level Android devices.<br>
+                • <b>EfficientNet-B0 (5.3M params, 21.4 MB):</b> Top-performing architecture with verified <b>81.25%</b> test accuracy, <b>80.81%</b> macro F1, and highest Healthy recall (90.71%). Ideal for high-throughput server-side automated screening.<br>
+                • <b>ResNet-50 (25.6M params, 90.7 MB):</b> High-capacity deep residual network achieving <b>79.75%</b> test accuracy (78.60% macro F1). Strong Black Rot recognition (82.93%), though with lower recall on Insect Hole (64.58%) and 6.4× larger model size than MobileNetV2.
             </div>
         </div>
-        """,
+        """),
         unsafe_allow_html=True
     )
 

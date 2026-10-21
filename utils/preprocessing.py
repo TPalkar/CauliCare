@@ -64,11 +64,13 @@ def preprocess_image_tensor(image: Image.Image, model_name: str = DEFAULT_PRODUC
     # Expand to batch shape (1, H, W, C)
     batch_array = np.expand_dims(img_array, axis=0)
 
-    # Architecture-specific normalization matching train.py
+    # Architecture-specific normalization matching training pipelines
     if "mobilenet" in model_name.lower():
         return tf.keras.applications.mobilenet_v2.preprocess_input(batch_array)
     elif "efficientnet" in model_name.lower():
         return tf.keras.applications.efficientnet.preprocess_input(batch_array)
+    elif "resnet" in model_name.lower():
+        return tf.keras.applications.resnet50.preprocess_input(batch_array)
     else:
         # Standard fallback: normalize to [-1, 1]
         return (batch_array / 127.5) - 1.0

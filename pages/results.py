@@ -5,6 +5,7 @@ probability distribution chart, agronomic disease details, and downloadable diag
 """
 
 import io
+import textwrap
 from pathlib import Path
 import streamlit as st
 from PIL import Image
@@ -127,7 +128,7 @@ def show():
         urgency_str = disease_data.get("urgency", "N/A")
 
         st.markdown(
-            f"""
+            textwrap.dedent(f"""
             <div class="cc-card">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
                     <div>
@@ -143,26 +144,23 @@ def show():
                         {render_badge(f"Severity: {severity_str}", status_variant)}
                     </div>
                 </div>
-                
-                <div style="margin: 1.25rem 0 0.5rem 0;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 0.35rem;">
-                        <span style="font-weight: 600; color: {THEME['text_muted']};">Model Confidence:</span>
-                        <span style="font-weight: 700; color: {THEME['primary']}; font-size: 1.05rem;">{confidence_pct:.2f}%</span>
-                    </div>
-            """,
+                <div style="margin-top: 1rem; margin-bottom: 0.35rem; display: flex; justify-content: space-between; font-size: 0.88rem;">
+                    <span style="font-weight: 600; color: {THEME['text_muted']};">Model Confidence:</span>
+                    <span style="font-weight: 700; color: {THEME['primary']}; font-size: 1.05rem;">{confidence_pct:.2f}%</span>
+                </div>
+            </div>
+            """),
             unsafe_allow_html=True
         )
 
         st.progress(min(max(confidence_pct / 100.0, 0.0), 1.0))
 
         st.markdown(
-            f"""
-                    <div style="font-size: 0.78rem; color: {THEME['text_muted']}; margin-top: 0.35rem;">
-                        Urgency protocol: <b>{urgency_str}</b>
-                    </div>
-                </div>
+            textwrap.dedent(f"""
+            <div style="font-size: 0.8rem; color: {THEME['text_muted']}; margin-top: -0.5rem; margin-bottom: 1rem;">
+                Urgency protocol: <b>{urgency_str}</b>
             </div>
-            """,
+            """),
             unsafe_allow_html=True
         )
 
@@ -182,6 +180,64 @@ def show():
                 """,
                 unsafe_allow_html=True
             )
+
+    # ==========================================================================
+    # VISUAL EXPLAINABILITY: GRAD-CAM SALIENCY
+    # ==========================================================================
+    gradcam_info = result.get("gradcam")
+    overlay_img = None
+    heatmap_img = None
+    layer_name = "ConvLayer"
+
+    if gradcam_info and gradcam_info.get("overlay") is not None:
+        overlay_img = gradcam_info["overlay"]
+        heatmap_img = gradcam_info.get("heatmap")
+        layer_name = gradcam_info.get("layer_name", "ConvLayer")
+    else:
+        from utils.gradcam import discover_gradcam_artifacts
+        artifacts = discover_gradcam_artifacts(model_name)
+        if artifacts.get("overlay") and Path(artifacts["overlay"]).exists():
+            overlay_img = Image.open(artifacts["overlay"])
+            if artifacts.get("heatmap") and Path(artifacts["heatmap"]).exists():
+                heatmap_img = Image.open(artifacts["heatmap"])
+            layer_name = "Deep Conv Layer"
+
+    if overlay_img is not None:
+        st.markdown(
+            f"""
+            <div class="cc-card">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.35rem;">
+                    <h3 class="cc-card-title" style="margin: 0;">Visual Attention & Grad-CAM Explainability</h3>
+                    <span class="cc-badge cc-badge-success">Gradient Attributed</span>
+                </div>
+                <p class="cc-card-desc">
+                    Spatial localization maps computed using TensorFlow <code>GradientTape</code> on the deepest convolutional layer 
+                    (<code>{layer_name}</code>) of the <b>{model_name}</b> architecture.
+                    Highlighted regions indicate foliage sectors that most heavily contributed to the <b>{predicted_class}</b> classification.
+                </p>
+            """,
+            unsafe_allow_html=True
+        )
+
+        gc1, gc2, gc3 = st.columns(3)
+        with gc1:
+            st.image(uploaded_image, caption="Original Leaf Specimen", use_container_width=True)
+        with gc2:
+            if heatmap_img is not None:
+                st.image(heatmap_img, caption="Normalized Activation Map", use_container_width=True)
+        with gc3:
+            st.image(overlay_img, caption=f"Attention Overlay ({predicted_class})", use_container_width=True)
+
+        st.markdown(
+            f"""
+            <div style="background: #F9FAF8; border: 1px solid #E2E7DF; border-radius: 8px; padding: 0.75rem 1rem; margin-top: 0.75rem; font-size: 0.82rem; color: {THEME['text_muted']};">
+                <b>Agronomic Interpretation:</b> Warm spectral colors (red/yellow) indicate leaf regions with high activation gradients 
+                governing the decision boundary, whereas cool tones (blue) represent background or unweighted leaf parenchyma.
+            </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     # ==========================================================================
     # DISEASE SPECIFIC AGRONOMIC GUIDANCE
