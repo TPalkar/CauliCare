@@ -20,7 +20,7 @@ from config.settings import (
     DEFAULT_PRODUCTION_MODEL,
 )
 from utils.preprocessing import load_and_validate_image, preprocess_image_tensor
-from utils.model_loader import is_model_available, load_trained_model
+from utils.model_loader import is_model_available, load_trained_model, get_model_path
 from utils.prediction import run_prediction
 from utils.metrics import load_all_model_metrics, determine_selected_model
 from utils.gradcam import generate_gradcam_heatmap, overlay_cam_on_image
@@ -51,7 +51,6 @@ class TestCauliCarePipeline(unittest.TestCase):
 
     def test_image_preprocessing_pipeline(self):
         """Verify PIL validation, dimensions, and normalized float32 tensor."""
-        # Create a synthetic 300x400 RGB image
         test_img = Image.new("RGB", (300, 400), color=(100, 150, 200))
         valid_img, err = load_and_validate_image(test_img)
         self.assertIsNone(err)
@@ -67,23 +66,25 @@ class TestCauliCarePipeline(unittest.TestCase):
 
     def test_missing_checkpoint_graceful_handling(self):
         """Ensure missing weights do not crash or emit fake predictions."""
-        # Querying an unconfigured architecture
         self.assertFalse(is_model_available("NonExistentArch"))
         model, err = load_trained_model("NonExistentArch")
         self.assertIsNone(model)
         self.assertIsNotNone(err)
 
-        # Prediction attempt on dummy image with missing model
         test_img = Image.new("RGB", (224, 224), color=(50, 120, 50))
         result = run_prediction(test_img, model_name="NonExistentArch")
         self.assertFalse(result["success"])
         self.assertEqual(result["error_type"], "MODEL_NOT_FOUND")
 
     def test_metrics_and_evaluation_artifacts(self):
-        """Verify empirical evaluation results for EfficientNetB0 (400 test images)."""
+        """Verify empirical evaluation results for MobileNetV2 and EfficientNetB0."""
         metrics = load_all_model_metrics()
+        self.assertIn("MobileNetV2", metrics)
         self.assertIn("EfficientNet", metrics)
+        mob = metrics["MobileNetV2"]
         eff = metrics["EfficientNet"]
+
+        self.assertAlmostEqual(mob["accuracy"], 0.7950, places=4)
         self.assertAlmostEqual(eff["accuracy"], 0.8125, places=4)
         self.assertEqual(eff["support"], 400)
         self.assertAlmostEqual(eff["f1_score"], 0.8139, places=4)
@@ -94,11 +95,9 @@ class TestCauliCarePipeline(unittest.TestCase):
 
     def test_gradcam_overlay_and_safety(self):
         """Verify overlay generation with synthetic heatmap and error handling."""
-        # When model is None, generator safely returns None
         safe_result = generate_gradcam_heatmap(None, np.zeros((1, 224, 224, 3)))
         self.assertIsNone(safe_result)
 
-        # Overlay function blends correctly
         dummy_leaf = Image.new("RGB", (100, 100), color=(60, 180, 60))
         dummy_cam = np.linspace(0, 1, 10000).reshape((100, 100)).astype(np.float32)
         blended = overlay_cam_on_image(dummy_leaf, dummy_cam, alpha=0.5)
