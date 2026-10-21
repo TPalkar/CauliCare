@@ -1,0 +1,23 @@
+ResNet50 - CauliCare Test Evaluation
+==========================================
+Test images: 400
+Test loss: 0.4433
+Test accuracy: 79.75%
+
+Class order: Healthy, Black Rot, Insect Hole
+
+Classification report:
+              precision    recall  f1-score   support
+
+     Healthy     0.7333    0.8643    0.7934       140
+   Black Rot     0.8500    0.8293    0.8395       164
+ Insect Hole     0.8267    0.6458    0.7251        96
+
+    accuracy                         0.7975       400
+   macro avg     0.8033    0.7798    0.7860       400
+weighted avg     0.8036    0.7975    0.7959       400
+
+Confusion matrix:
+[[121  12   7]
+ [ 22 136   6]
+ [ 22  12  62]]
