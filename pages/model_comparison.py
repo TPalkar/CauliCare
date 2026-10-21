@@ -6,6 +6,7 @@ parameter scale, latency, confusion matrices, training histories, and Grad-CAM i
 
 import textwrap
 from pathlib import Path
+import pandas as pd
 import streamlit as st
 from PIL import Image
 
@@ -231,22 +232,25 @@ def show():
         with hist_tabs[idx]:
             history = load_training_history(model_name)
             if history and "train_acc" in history:
-                # Summary metrics row
                 best_epoch = history.get("best_epoch", "N/A")
                 best_val = history.get("best_val_acc")
                 best_val_str = f"{best_val*100:.2f}%" if best_val is not None else "N/A"
                 tot_epochs = history.get("total_epochs", len(history.get("train_acc", [])))
+                min_loss = history.get("min_val_loss")
+                min_loss_str = f"{min_loss:.4f}" if min_loss is not None else "N/A"
+                src_file = history.get("source_file", "history.csv")
 
-                st.markdown(
-                    f"""
-                    <div style="display: flex; gap: 1.5rem; background: #F9FAF8; border: 1px solid #E2E7DF; border-radius: 8px; padding: 0.75rem 1.25rem; margin-bottom: 1rem; flex-wrap: wrap;">
-                        <div><span style="color: {THEME['text_muted']}; font-size: 0.8rem;">Total Epochs:</span> <b style="color: {THEME['primary']};">{tot_epochs}</b></div>
-                        <div><span style="color: {THEME['text_muted']}; font-size: 0.8rem;">Best Epoch:</span> <b style="color: {THEME['primary']};">Epoch {best_epoch}</b></div>
-                        <div><span style="color: {THEME['text_muted']}; font-size: 0.8rem;">Peak Val Accuracy:</span> <b style="color: {THEME['success']};">{best_val_str}</b></div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+                m_col1, m_col2, m_col3, m_col4 = st.columns(4)
+                with m_col1:
+                    st.metric("Total Epochs", tot_epochs)
+                with m_col2:
+                    st.metric("Best Epoch", f"Epoch {best_epoch}")
+                with m_col3:
+                    st.metric("Peak Val Accuracy", best_val_str)
+                with m_col4:
+                    st.metric("Min Val Loss", min_loss_str)
+
+                st.caption(f"Convergence history source: `results/training_history/{src_file}`")
 
                 curve_fig = create_training_curves(history)
                 if curve_fig:
@@ -259,11 +263,11 @@ def show():
                             {model_name} Training History Unrecorded
                         </div>
                         <div style="font-size: 0.85rem; color: {THEME['text_muted']}; margin-top: 0.25rem;">
-                            Run training script to record <code>history.csv</code>.
+                            No verified training history found for {model_name} in <code>results/training_history/</code>.
                         </div>
                     </div>
                     """,
-                    unsafe_allow_html=True
+                    unsafe_allow_html=True,
                 )
 
     st.markdown("</div>", unsafe_allow_html=True)
@@ -321,70 +325,110 @@ def show():
     st.markdown("</div>", unsafe_allow_html=True)
 
     # ==========================================================================
-    # SECTION F: MODEL COMPARISON TABLE (Rendered as single complete HTML block)
+    # SECTION F: MODEL COMPARISON TABLE (Native Streamlit DataFrame)
     # ==========================================================================
-    table_rows_html = []
+    st.markdown(
+        f"""
+        <div class="cc-card">
+            <h3 class="cc-card-title">Comprehensive Architectural Comparison</h3>
+            <p class="cc-card-desc">Standardized evaluation across the held-out cauliflower test split (400 images).</p>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    table_data = []
     for model_name in SUPPORTED_MODELS:
         m = all_metrics.get(model_name, {})
         display_name = {
-            "MobileNetV2": "MobileNetV2",
+            "MobileNetV2": "MobileNetV2 (Baseline)",
             "EfficientNet": "EfficientNet-B0",
             "ResNet": "ResNet-50",
         }.get(model_name, model_name)
 
-        acc_val = f"{m['accuracy']*100:.2f}%" if m.get("accuracy") is not None else "Pending"
-        prec_val = f"{m.get('macro_precision', m.get('precision', 0))*100:.2f}%" if m.get("precision") is not None else "Pending"
-        rec_val = f"{m.get('macro_recall', m.get('recall', 0))*100:.2f}%" if m.get("recall") is not None else "Pending"
-        macro_f1_val = f"{m.get('macro_f1', m.get('f1_score', 0))*100:.2f}%" if m.get("macro_f1") is not None else "Pending"
-        weighted_f1_val = f"{m.get('f1_score', 0)*100:.2f}%" if m.get("f1_score") is not None else "Pending"
-        size_val = f"{m['model_size_mb']:.1f} MB" if m.get("model_size_mb") is not None else "Unmeasured"
-        lat_val = f"{m['inference_time_ms']:.1f} ms" if m.get("inference_time_ms") is not None else "Unmeasured"
+        acc_val = f"{m['accuracy']*100:.2f}%" if m.get("accuracy") is not None else "Unavailable"
+        prec_val = f"{m.get('macro_precision', m.get('precision', 0))*100:.2f}%" if m.get("precision") is not None else "Unavailable"
+        rec_val = f"{m.get('macro_recall', m.get('recall', 0))*100:.2f}%" if m.get("recall") is not None else "Unavailable"
+        macro_f1_val = f"{m.get('macro_f1', m.get('f1_score', 0))*100:.2f}%" if m.get("macro_f1") is not None else "Unavailable"
+        weighted_f1_val = f"{m.get('f1_score', 0)*100:.2f}%" if m.get("f1_score") is not None else "Unavailable"
+        size_val = f"{m['model_size_mb']:.1f} MB" if m.get("model_size_mb") is not None else "Unavailable"
+        lat_val = f"{m['inference_time_ms']:.1f} ms" if m.get("inference_time_ms") is not None else "Unavailable"
         framework_str = "TensorFlow / Keras"
         status_str = m.get("status", "Evaluated Candidate")
 
-        table_rows_html.append(f"""
-            <tr>
-                <td><b>{display_name}</b></td>
-                <td><b>{acc_val}</b></td>
-                <td>{prec_val}</td>
-                <td>{rec_val}</td>
-                <td>{macro_f1_val}</td>
-                <td>{weighted_f1_val}</td>
-                <td>{size_val}</td>
-                <td>{lat_val}</td>
-                <td>{framework_str}</td>
-                <td><code>{status_str}</code></td>
-            </tr>
-        """)
+        table_data.append({
+            "Model Architecture": display_name,
+            "Test Accuracy": acc_val,
+            "Precision": prec_val,
+            "Recall": rec_val,
+            "Macro F1": macro_f1_val,
+            "Weighted F1": weighted_f1_val,
+            "Model Size": size_val,
+            "Inference Latency": lat_val,
+            "Framework": framework_str,
+            "Evaluation Status": status_str,
+        })
 
-    full_table_markup = textwrap.dedent(f"""
-    <div class="cc-card">
-        <h3 class="cc-card-title">Comprehensive Architectural Comparison</h3>
-        <p class="cc-card-desc">Standardized evaluation across the held-out cauliflower test split (400 images).</p>
-        <div style="overflow-x: auto; margin-top: 0.5rem;">
-            <table class="cc-table" style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <th style="text-align: left; padding: 10px 12px;">Architecture</th>
-                        <th style="text-align: left; padding: 10px 12px;">Test Accuracy</th>
-                        <th style="text-align: left; padding: 10px 12px;">Macro Precision</th>
-                        <th style="text-align: left; padding: 10px 12px;">Macro Recall</th>
-                        <th style="text-align: left; padding: 10px 12px;">Macro F1</th>
-                        <th style="text-align: left; padding: 10px 12px;">Weighted F1</th>
-                        <th style="text-align: left; padding: 10px 12px;">Model Size</th>
-                        <th style="text-align: left; padding: 10px 12px;">Latency</th>
-                        <th style="text-align: left; padding: 10px 12px;">Framework</th>
-                        <th style="text-align: left; padding: 10px 12px;">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {''.join(table_rows_html)}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    """)
-    st.markdown(full_table_markup, unsafe_allow_html=True)
+    comparison_df = pd.DataFrame(table_data)
+
+    st.dataframe(
+        comparison_df,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Model Architecture": st.column_config.TextColumn(
+                "Model Architecture",
+                help="Deep convolutional neural network architecture evaluated on cauliflower leaf dataset.",
+                width="medium",
+            ),
+            "Test Accuracy": st.column_config.TextColumn(
+                "Test Accuracy",
+                help="Overall test classification accuracy on the held-out 400-image test set.",
+                width="small",
+            ),
+            "Precision": st.column_config.TextColumn(
+                "Precision",
+                help="Macro-averaged precision across all 3 leaf health classes.",
+                width="small",
+            ),
+            "Recall": st.column_config.TextColumn(
+                "Recall",
+                help="Macro-averaged recall across all 3 leaf health classes.",
+                width="small",
+            ),
+            "Macro F1": st.column_config.TextColumn(
+                "Macro F1",
+                help="Unweighted average F1-score across all 3 classes (sensitive to minority class errors).",
+                width="small",
+            ),
+            "Weighted F1": st.column_config.TextColumn(
+                "Weighted F1",
+                help="Support-weighted F1-score across all test samples.",
+                width="small",
+            ),
+            "Model Size": st.column_config.TextColumn(
+                "Model Size",
+                help="Trained checkpoint file footprint on disk in megabytes.",
+                width="small",
+            ),
+            "Inference Latency": st.column_config.TextColumn(
+                "Inference Latency",
+                help="Average CPU inference execution latency per specimen in milliseconds.",
+                width="small",
+            ),
+            "Framework": st.column_config.TextColumn(
+                "Framework",
+                help="Deep learning engine and checkpoint format.",
+                width="medium",
+            ),
+            "Evaluation Status": st.column_config.TextColumn(
+                "Evaluation Status",
+                help="Verification and deployment status in CauliCare pipeline.",
+                width="large",
+            ),
+        },
+    )
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
     # ==========================================================================
     # SECTION G: SELECTED MODEL & JUSTIFICATION

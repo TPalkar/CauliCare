@@ -143,6 +143,50 @@ class TestCauliCarePipeline(unittest.TestCase):
         self.assertIn("Black Rot", report)
         self.assertIn("89.50%", report)
         self.assertIn("Xanthomonas campestris", report)
+    def test_training_history_curves(self):
+        """Verify that genuine training history curves load for all three models."""
+        from utils.metrics import load_training_history
+        from components.charts import create_training_curves
+
+        for model_name in ["MobileNetV2", "EfficientNet", "ResNet"]:
+            history = load_training_history(model_name)
+            self.assertIsNotNone(history, f"History should load for {model_name}")
+            self.assertIn("train_acc", history)
+            self.assertIn("val_acc", history)
+            self.assertIn("train_loss", history)
+            self.assertIn("val_loss", history)
+            self.assertIn("total_epochs", history)
+            self.assertGreater(history["total_epochs"], 0)
+            self.assertIn("best_epoch", history)
+            self.assertGreater(history["best_val_acc"], 0.70)
+
+            # Test Plotly dual-panel chart generation
+            fig = create_training_curves(history)
+            self.assertIsNotNone(fig, f"Figure should generate for {model_name}")
+
+    def test_comparison_dataframe_generation(self):
+        """Verify architectural comparison table data source and structure."""
+        import pandas as pd
+        from utils.metrics import load_all_model_metrics
+        from config.settings import SUPPORTED_MODELS
+
+        metrics = load_all_model_metrics()
+        table_data = []
+        for model_name in SUPPORTED_MODELS:
+            m = metrics.get(model_name, {})
+            self.assertIsNotNone(m.get("accuracy"))
+            self.assertIsNotNone(m.get("model_size_mb"))
+            table_data.append({
+                "Model Architecture": model_name,
+                "Test Accuracy": f"{m['accuracy']*100:.2f}%",
+                "Macro F1": f"{m.get('macro_f1', 0)*100:.2f}%",
+                "Model Size": f"{m['model_size_mb']:.1f} MB",
+                "Framework": "TensorFlow / Keras",
+            })
+        df = pd.DataFrame(table_data)
+        self.assertEqual(len(df), len(SUPPORTED_MODELS))
+        self.assertIn("Test Accuracy", df.columns)
+        self.assertIn("Macro F1", df.columns)
 
 
 if __name__ == "__main__":

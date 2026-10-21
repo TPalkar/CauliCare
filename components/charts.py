@@ -5,8 +5,9 @@ model comparison bars, confusion matrices, and training curves.
 Compatible with modern Plotly layout APIs.
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import plotly.express as px
 import pandas as pd
 from config.settings import THEME, CHART_COLORS, CLASS_NAMES
@@ -396,48 +397,164 @@ def create_confusion_matrix_heatmap(matrix_data: List[List[int]], class_names: L
     return fig
 
 
-def create_training_curves(history: Dict[str, List[float]]) -> Optional[go.Figure]:
+def create_training_curves(history: Dict[str, Any]) -> Optional[go.Figure]:
     """
-    Plots training vs validation accuracy and loss over epochs.
-    Expects dict with keys: 'train_acc', 'val_acc', 'train_loss', 'val_loss'.
+    Plots training vs validation accuracy and loss over epochs using dual subplots.
+    Expects dict with keys: 'train_acc', 'val_acc', 'train_loss', 'val_loss', and optionally 'epochs'.
     """
-    epochs = list(range(1, len(history.get("train_acc", [])) + 1))
+    epochs = history.get("epochs")
+    if not epochs:
+        n = max(
+            len(history.get("train_acc", [])),
+            len(history.get("val_acc", [])),
+            len(history.get("train_loss", [])),
+            len(history.get("val_loss", [])),
+        )
+        epochs = list(range(1, n + 1))
     if not epochs:
         return None
 
-    fig = go.Figure()
+    has_acc = bool(history.get("train_acc") or history.get("val_acc"))
+    has_loss = bool(history.get("train_loss") or history.get("val_loss"))
 
+    if has_acc and has_loss:
+        fig = make_subplots(
+            rows=1,
+            cols=2,
+            subplot_titles=[
+                "<b>Accuracy Trajectory</b> (Train vs. Val)",
+                "<b>Loss Trajectory</b> (Train vs. Val)",
+            ],
+            horizontal_spacing=0.10,
+        )
+
+        # Accuracy Subplot (Col 1)
+        if "train_acc" in history and history["train_acc"]:
+            t_acc = history["train_acc"]
+            fig.add_trace(
+                go.Scatter(
+                    x=epochs[:len(t_acc)],
+                    y=[v * 100 if v <= 1 else v for v in t_acc],
+                    mode="lines+markers",
+                    name="Train Accuracy",
+                    line=dict(color="#2F6B4F", width=2.5),
+                    marker=dict(size=6, symbol="circle"),
+                    hovertemplate="Epoch %{x}<br>Train Acc: %{y:.2f}%<extra></extra>",
+                ),
+                row=1,
+                col=1,
+            )
+        if "val_acc" in history and history["val_acc"]:
+            v_acc = history["val_acc"]
+            fig.add_trace(
+                go.Scatter(
+                    x=epochs[:len(v_acc)],
+                    y=[v * 100 if v <= 1 else v for v in v_acc],
+                    mode="lines+markers",
+                    name="Val Accuracy",
+                    line=dict(color="#173F35", width=2.5, dash="dash"),
+                    marker=dict(size=6, symbol="square"),
+                    hovertemplate="Epoch %{x}<br>Val Acc: %{y:.2f}%<extra></extra>",
+                ),
+                row=1,
+                col=1,
+            )
+
+        # Loss Subplot (Col 2)
+        if "train_loss" in history and history["train_loss"]:
+            t_loss = history["train_loss"]
+            fig.add_trace(
+                go.Scatter(
+                    x=epochs[:len(t_loss)],
+                    y=t_loss,
+                    mode="lines+markers",
+                    name="Train Loss",
+                    line=dict(color="#B45309", width=2.5),
+                    marker=dict(size=6, symbol="circle"),
+                    hovertemplate="Epoch %{x}<br>Train Loss: %{y:.4f}<extra></extra>",
+                ),
+                row=1,
+                col=2,
+            )
+        if "val_loss" in history and history["val_loss"]:
+            v_loss = history["val_loss"]
+            fig.add_trace(
+                go.Scatter(
+                    x=epochs[:len(v_loss)],
+                    y=v_loss,
+                    mode="lines+markers",
+                    name="Val Loss",
+                    line=dict(color="#991B1B", width=2.5, dash="dash"),
+                    marker=dict(size=6, symbol="diamond"),
+                    hovertemplate="Epoch %{x}<br>Val Loss: %{y:.4f}<extra></extra>",
+                ),
+                row=1,
+                col=2,
+            )
+
+        step = max(1, len(epochs) // 8 or 1)
+        fig.update_xaxes(title_text="Epoch", gridcolor="#EDF2EC", dtick=step, row=1, col=1)
+        fig.update_xaxes(title_text="Epoch", gridcolor="#EDF2EC", dtick=step, row=1, col=2)
+        fig.update_yaxes(title_text="Accuracy (%)", gridcolor="#EDF2EC", row=1, col=1)
+        fig.update_yaxes(title_text="Cross-Entropy Loss", gridcolor="#EDF2EC", row=1, col=2)
+
+        fig.update_layout(
+            legend=dict(
+                orientation="h",
+                yanchor="top",
+                y=-0.22,
+                xanchor="center",
+                x=0.5,
+                font=dict(family="Inter, sans-serif", size=11),
+            ),
+            margin=dict(l=40, r=20, t=45, b=70),
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)",
+            height=360,
+        )
+        return fig
+
+    # Single plot fallback if only accuracy is present
+    fig = go.Figure()
     if "train_acc" in history:
-        fig.add_trace(go.Scatter(
-            x=epochs, y=[v * 100 if v <= 1 else v for v in history["train_acc"]],
-            mode="lines+markers", name="Train Accuracy",
-            line=dict(color="#2F6B4F", width=2.5)
-        ))
+        fig.add_trace(
+            go.Scatter(
+                x=epochs[:len(history["train_acc"])],
+                y=[v * 100 if v <= 1 else v for v in history["train_acc"]],
+                mode="lines+markers",
+                name="Train Accuracy",
+                line=dict(color="#2F6B4F", width=2.5),
+            )
+        )
     if "val_acc" in history:
-        fig.add_trace(go.Scatter(
-            x=epochs, y=[v * 100 if v <= 1 else v for v in history["val_acc"]],
-            mode="lines+markers", name="Val Accuracy",
-            line=dict(color="#173F35", width=2.5, dash="dash")
-        ))
+        fig.add_trace(
+            go.Scatter(
+                x=epochs[:len(history["val_acc"])],
+                y=[v * 100 if v <= 1 else v for v in history["val_acc"]],
+                mode="lines+markers",
+                name="Val Accuracy",
+                line=dict(color="#173F35", width=2.5, dash="dash"),
+            )
+        )
 
     fig.update_layout(
         title=dict(
             text="Learning Progress: Train vs. Validation Accuracy",
             font=dict(family="Inter, sans-serif", size=14, color=THEME["primary"]),
-            x=0.02
+            x=0.02,
         ),
         xaxis=dict(
             title=dict(text="Epoch", font=dict(family="Inter, sans-serif", size=12, color=THEME["text_muted"])),
-            gridcolor="#EDF2EC"
+            gridcolor="#EDF2EC",
         ),
         yaxis=dict(
             title=dict(text="Accuracy (%)", font=dict(family="Inter, sans-serif", size=12, color=THEME["text_muted"])),
-            gridcolor="#EDF2EC"
+            gridcolor="#EDF2EC",
         ),
         legend=dict(orientation="h", yanchor="bottom", y=-0.25, xanchor="center", x=0.5),
         margin=dict(l=40, r=20, t=50, b=40),
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
-        height=300
+        height=320,
     )
     return fig

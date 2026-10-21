@@ -7,6 +7,7 @@ EfficientNet-B0, and ResNet-50 from repository benchmark reports.
 import json
 from pathlib import Path
 from typing import Dict, Any, Optional, List
+import numpy as np
 import pandas as pd
 
 from config.settings import (
@@ -179,52 +180,101 @@ def get_confusion_matrix_image(model_name: str) -> Optional[Path]:
     return None
 
 
-def load_training_history(model_name: str) -> Optional[Dict[str, List[float]]]:
+def load_training_history(model_name: str) -> Optional[Dict[str, Any]]:
     """
     Loads training dynamics from CSV or JSON for MobileNetV2, EfficientNet-B0, or ResNet-50.
+    Normalizes column names, calculates convergence metrics, and validates consistency.
     """
-    csv_candidates = []
     clean = model_name.lower().replace("-", "").replace("_", "")
+    csv_candidates = []
 
     if "mobile" in clean:
         csv_candidates = [
+            HISTORY_DIR / "mobilenetv2_history.csv",
+            HISTORY_DIR / "mobilenetv2_finetune_history.csv",
             BASE_DIR / "finetuning_history.csv",
             BASE_DIR / "training_history.csv",
-            HISTORY_DIR / "mobilenetv2_history.csv",
         ]
     elif "efficient" in clean:
         csv_candidates = [
-            BASE_DIR / "efficientnetb0_history.csv",
+            HISTORY_DIR / "efficientnet_history.csv",
             HISTORY_DIR / "efficientnetb0_history.csv",
+            BASE_DIR / "efficientnetb0_history.csv",
         ]
     elif "resnet" in clean:
         csv_candidates = [
-            BASE_DIR / "resnet50_history.csv",
+            HISTORY_DIR / "resnet_history.csv",
             HISTORY_DIR / "resnet50_history.csv",
+            BASE_DIR / "resnet50_history.csv",
+        ]
+    else:
+        csv_candidates = [
+            HISTORY_DIR / f"{clean}_history.csv",
+            BASE_DIR / f"{clean}_history.csv",
         ]
 
     for csv_file in csv_candidates:
         if csv_file.exists():
             try:
                 df = pd.read_csv(csv_file)
-                hist = {}
-                if "accuracy" in df.columns:
-                    hist["train_acc"] = df["accuracy"].tolist()
-                if "val_accuracy" in df.columns:
-                    hist["val_acc"] = df["val_accuracy"].tolist()
-                if "loss" in df.columns:
-                    hist["train_loss"] = df["loss"].tolist()
-                if "val_loss" in df.columns:
-                    hist["val_loss"] = df["val_loss"].tolist()
+                if df.empty:
+                    continue
 
-                # Calculate summary diagnostics
-                if hist.get("val_acc"):
-                    best_epoch = int(np.argmax(hist["val_acc"])) + 1
-                    hist["best_epoch"] = best_epoch
-                    hist["best_val_acc"] = float(np.max(hist["val_acc"]))
-                    hist["total_epochs"] = len(hist["val_acc"])
+                cols = {str(c).strip().lower(): c for c in df.columns}
 
-                return hist
+                acc_col = None
+                for cand in ["accuracy", "acc", "train_acc", "train_accuracy"]:
+                    if cand in cols:
+                        acc_col = cols[cand]
+                        break
+
+                val_acc_col = None
+                for cand in ["val_accuracy", "val_acc", "validation_accuracy", "validation_acc"]:
+                    if cand in cols:
+                        val_acc_col = cols[cand]
+                        break
+
+                loss_col = None
+                for cand in ["loss", "train_loss"]:
+                    if cand in cols:
+                        loss_col = cols[cand]
+                        break
+
+                val_loss_col = None
+                for cand in ["val_loss", "validation_loss"]:
+                    if cand in cols:
+                        val_loss_col = cols[cand]
+                        break
+
+                hist: Dict[str, Any] = {}
+                if acc_col:
+                    hist["train_acc"] = [float(v) for v in df[acc_col].tolist()]
+                if val_acc_col:
+                    hist["val_acc"] = [float(v) for v in df[val_acc_col].tolist()]
+                if loss_col:
+                    hist["train_loss"] = [float(v) for v in df[loss_col].tolist()]
+                if val_loss_col:
+                    hist["val_loss"] = [float(v) for v in df[val_loss_col].tolist()]
+
+                if "epoch" in cols:
+                    hist["epochs"] = [int(v) for v in df[cols["epoch"]].tolist()]
+                else:
+                    n = max(len(hist.get("train_acc", [])), len(hist.get("val_acc", [])))
+                    hist["epochs"] = list(range(1, n + 1))
+
+                if hist.get("train_acc") or hist.get("val_acc"):
+                    if hist.get("val_acc"):
+                        best_idx = int(np.argmax(hist["val_acc"]))
+                        epochs_list = hist.get("epochs", [])
+                        hist["best_epoch"] = epochs_list[best_idx] if len(epochs_list) > best_idx else (best_idx + 1)
+                        hist["best_val_acc"] = float(hist["val_acc"][best_idx])
+                    if hist.get("val_loss"):
+                        min_loss_idx = int(np.argmin(hist["val_loss"]))
+                        hist["min_val_loss"] = float(hist["val_loss"][min_loss_idx])
+
+                    hist["total_epochs"] = len(hist.get("train_acc") or hist.get("val_acc") or [])
+                    hist["source_file"] = csv_file.name
+                    return hist
             except Exception:
                 pass
 
@@ -232,7 +282,9 @@ def load_training_history(model_name: str) -> Optional[Dict[str, List[float]]]:
     if json_path.exists():
         try:
             with open(json_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+                if isinstance(data, dict):
+                    return data
         except Exception:
             pass
 
