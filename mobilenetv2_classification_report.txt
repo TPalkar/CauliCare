@@ -1,0 +1,14 @@
+Original MobileNetV2 Evaluation
+
+Test loss: 0.5302
+Test accuracy: 0.7700 (77.00%)
+
+              precision    recall  f1-score   support
+
+     Healthy     0.8288    0.6571    0.7331       140
+   Black Rot     0.8662    0.8293    0.8474       164
+ Insect Hole     0.6061    0.8333    0.7018        96
+
+    accuracy                         0.7700       400
+   macro avg     0.7670    0.7732    0.7607       400
+weighted avg     0.7907    0.7700    0.7724       400
