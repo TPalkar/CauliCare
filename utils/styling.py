@@ -6,7 +6,7 @@ Injects custom AgriTech CSS, renders UI components, and ensures consistent visua
 import base64
 from pathlib import Path
 import streamlit as st
-from config.settings import ASSETS_DIR, THEME
+from config.settings import ASSETS_DIR, THEME, LOGO_PATH
 
 
 def load_css() -> str:
@@ -26,11 +26,11 @@ def apply_custom_css():
 
 def render_header(subtitle: str = "Cauliflower leaf health analysis"):
     """
-    Renders the unified header banner with CauliCare branding and preserved logo artwork.
+    Renders the unified header banner with CauliCare branding and new logo.
     Main heading: CauliCare.
     Status badge removed completely for a clean, professional aesthetic.
     """
-    logo_path = ASSETS_DIR / "logo.png"
+    logo_path = LOGO_PATH
     if logo_path.exists():
         try:
             with open(logo_path, "rb") as f:

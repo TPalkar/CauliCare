@@ -7,15 +7,14 @@ Integrates AgriTech branding, session state persistence, and responsive styling.
 from pathlib import Path
 import streamlit as st
 from PIL import Image
-from config.settings import DEFAULT_PRODUCTION_MODEL, ASSETS_DIR
+from config.settings import DEFAULT_PRODUCTION_MODEL, LOGO_PATH
 from components.navigation import render_sidebar
 from utils.styling import apply_custom_css
 
 # ==============================================================================
 # STREAMLIT PAGE CONFIGURATION
 # ==============================================================================
-logo_path = ASSETS_DIR / "logo.png"
-fav_icon = Image.open(logo_path) if logo_path.exists() else None
+fav_icon = Image.open(LOGO_PATH) if LOGO_PATH.exists() else None
 
 st.set_page_config(
     page_title="CauliCare — Cauliflower Disease Classification",

@@ -22,6 +22,9 @@ HISTORY_DIR = RESULTS_DIR / "training_history"
 GRADCAM_DIR = RESULTS_DIR / "gradcam"
 SAMPLES_DIR = DATA_DIR / "samples"
 
+# Authoritative path to logo.png in project root
+LOGO_PATH = BASE_DIR / "logo.png" if (BASE_DIR / "logo.png").exists() else (ASSETS_DIR / "logo.png")
+
 # ==============================================================================
 # EXTERNAL REFERENCES
 # ==============================================================================

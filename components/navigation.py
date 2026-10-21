@@ -9,7 +9,7 @@ import streamlit as st
 from PIL import Image
 
 from config.settings import (
-    ASSETS_DIR,
+    LOGO_PATH,
     THEME,
     DEFAULT_PRODUCTION_MODEL,
     TOTAL_IMAGES,
@@ -24,11 +24,10 @@ def render_sidebar():
     Renders the modern AgriTech sidebar brand, system status, and links.
     """
     with st.sidebar:
-        # Logo and Brand Heading (Preserved Logo Artwork)
-        logo_path = ASSETS_DIR / "logo.png"
-        if logo_path.exists():
-            logo_img = Image.open(logo_path)
-            st.image(logo_img, width=64)
+        # Logo and Brand Heading
+        if LOGO_PATH.exists():
+            logo_img = Image.open(LOGO_PATH)
+            st.image(logo_img, width=68)
 
         st.markdown(
             f"""

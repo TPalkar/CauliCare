@@ -49,6 +49,15 @@ class TestCauliCarePipeline(unittest.TestCase):
         self.assertEqual(DISEASED_COUNT, 1727)
         self.assertEqual(HEALTHY_COUNT + DISEASED_COUNT, TOTAL_IMAGES)
 
+    def test_logo_asset_integrity(self):
+        """Verify that the new logo.png exists, is readable by PIL, and has valid dimensions."""
+        from config.settings import LOGO_PATH
+        self.assertTrue(LOGO_PATH.exists(), f"Logo should exist at {LOGO_PATH}")
+        with Image.open(LOGO_PATH) as logo:
+            self.assertGreater(logo.width, 0)
+            self.assertGreater(logo.height, 0)
+            self.assertEqual(logo.format, "PNG")
+
     def test_image_preprocessing_pipeline(self):
         """Verify PIL validation, dimensions, and normalized float32 tensor."""
         test_img = Image.new("RGB", (300, 400), color=(100, 150, 200))
