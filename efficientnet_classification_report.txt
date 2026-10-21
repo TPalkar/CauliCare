@@ -1,0 +1,14 @@
+EfficientNetB0 Test Evaluation
+
+Test loss: 0.4597
+Test accuracy: 0.8125 (81.25%)
+
+              precision    recall  f1-score   support
+
+     Healthy     0.7384    0.9071    0.8141       140
+   Black Rot     0.9606    0.7439    0.8385       164
+ Insect Hole     0.7525    0.7917    0.7716        96
+
+    accuracy                         0.8125       400
+   macro avg     0.8172    0.8142    0.8081       400
+weighted avg     0.8329    0.8125    0.8139       400
