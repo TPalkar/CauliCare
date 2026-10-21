@@ -25,7 +25,7 @@ if not CSV_PATH.exists():
 
 if not MODEL_PATH.exists():
     raise FileNotFoundError(
-        "Best model not found. Run train.py successfully first."
+        f"Fine-tuned model not found: {MODEL_PATH}"
     )
 
 df = pd.read_csv(CSV_PATH)
@@ -82,17 +82,17 @@ y_pred = np.argmax(probabilities, axis=1)
 print(f"\nTest loss: {loss:.4f}")
 print(f"Test accuracy: {accuracy:.4f} ({accuracy * 100:.2f}%)")
 
-print("\nClassification report:")
-print(
-    classification_report(
-        y_true,
-        y_pred,
-        labels=np.arange(len(CLASS_NAMES)),
-        target_names=CLASS_NAMES,
-        digits=4,
-        zero_division=0,
-    )
+report = classification_report(
+    y_true,
+    y_pred,
+    labels=np.arange(len(CLASS_NAMES)),
+    target_names=CLASS_NAMES,
+    digits=4,
+    zero_division=0,
 )
+
+print("\nClassification report:")
+print(report)
 
 cm = confusion_matrix(
     y_true,
@@ -106,11 +106,15 @@ display = ConfusionMatrixDisplay(
 )
 
 display.plot(values_format="d", xticks_rotation=25)
-plt.title("CauliCare - Test Set Confusion Matrix")
+plt.title("CauliCare - Fine-tuned MobileNetV2 Confusion Matrix")
 plt.tight_layout()
 
-output_path = PROJECT_DIR / "confusion_matrix.png"
-plt.savefig(output_path, dpi=200)
+output_path = PROJECT_DIR / "finetuned_mobilenetv2_confusion_matrix.png"
+plt.savefig(output_path, dpi=200, bbox_inches="tight")
 plt.close()
 
+report_path = PROJECT_DIR / "finetuned_mobilenetv2_report.txt"
+report_path.write_text(report, encoding="utf-8")
+
 print(f"\nConfusion matrix saved to: {output_path}")
+print(f"Classification report saved to: {report_path}")

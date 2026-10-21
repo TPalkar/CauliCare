@@ -1,0 +1,9 @@
+              precision    recall  f1-score   support
+
+     Healthy     0.7786    0.7786    0.7786       140
+   Black Rot     0.8354    0.8354    0.8354       164
+ Insect Hole     0.7500    0.7500    0.7500        96
+
+    accuracy                         0.7950       400
+   macro avg     0.7880    0.7880    0.7880       400
+weighted avg     0.7950    0.7950    0.7950       400
